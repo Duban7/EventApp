@@ -6,7 +6,7 @@ namespace Data.Models
     {
         public string? Name { get; set; }
         public string? Surname { get; set; }
-        public DateTime? BirdthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
         public string? RefreshToken { get; set; }
         public DateTime? RefreshExpires { get; set; }
         public List<Event>? Events { get; set; }

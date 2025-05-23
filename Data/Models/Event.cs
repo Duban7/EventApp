@@ -2,10 +2,11 @@
 {
     public class Event
     {
+        public string? Id { get; set; }
         public string? Name { get; set; }
         public string Description { get; set; } = "No Description";
         public DateTime? StartDate { get; set; }
-        public String? EventPlace { get; set; } = "not specified";
+        public string? EventPlace { get; set; } = "not specified";
         public string Category { get; set; } = "No category";
         public int MaxParticipantsCount { get; set; } = 30;
         public string? ImageURL { get; set; } 
