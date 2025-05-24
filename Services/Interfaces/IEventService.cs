@@ -1,4 +1,5 @@
 ﻿using Data.Models;
+using Microsoft.AspNetCore.Http;
 using Services.DTOs;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,8 @@ namespace Services.Interfaces
         public Task<Event> GetEventByName(string name);
         public Task<PaginatedList<Event>> GetEvents(int pageIndex, int PageSize);
         public Task<PaginatedList<Event>> GetEventsFiltered(EventFilterDTO filter, int pageIndex, int PageSize);
-        public Task<string> AddImageToEvent(string eventId, object obj);
+        public Task AddImageToEvent(string eventId, IFormFile imageFile);
         public Task RemoveImageFromEvent(string eventId);
+        public Task<(FileStream, string)> GetImage(string eventId); 
     }
 }

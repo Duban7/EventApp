@@ -89,9 +89,10 @@ namespace EventApp.Controllers
         [HttpPost]
         [Authorize(Policy = "AdminPolicy")]
         [Route("event/{eventId}/image")]
-        public async Task<ActionResult> AddImageToEvent([FromForm] FileStream file, string eventId)
+        public async Task<ActionResult> AddImageToEvent([FromForm] ImageDTO imageDTO, string eventId)
         {
-            await _eventService.AddImageToEvent(eventId, file);
+            await _eventService.AddImageToEvent(eventId, imageDTO.imageFile);
+
             return Ok();
         }
 
@@ -103,6 +104,18 @@ namespace EventApp.Controllers
             await _eventService.RemoveImageFromEvent(eventId);
 
             return Ok();
+        }
+
+        [HttpGet]
+        [Route("event/{eventId}/image")]
+        public async Task<ActionResult> GetEventImage(string eventId)
+        {
+            string cType;
+            FileStream imageFile;
+
+            (imageFile, cType) = await _eventService.GetImage(eventId);
+
+            return File(imageFile, cType);
         }
     }
 }

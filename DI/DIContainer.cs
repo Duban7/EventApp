@@ -1,11 +1,20 @@
 ﻿using Data.Context;
+using Data.Interfaces;
 using Data.Models;
+using Data.Repositories;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Services.Interfaces;
 using Services.Jwt;
+using Services.Mapper;
+using Services.Services;
+using Services.Validators;
+using System.Reflection;
 
 namespace EventApp.DI
 {
@@ -17,17 +26,21 @@ namespace EventApp.DI
             {
                 options.AddPolicy("AllowWithCredentials", builder =>
                 {
-                    builder.AllowAnyOrigin()
+                    builder.WithOrigins(
+                           "http://localhost:3000",
+                           "http://localhost:8080")
                            .AllowAnyHeader()
                            .AllowAnyMethod()
                            .AllowCredentials();
                 });
             });
 
-            services.AddDbContext<EventAppDbContext>(options =>
-                options.UseSqlServer(configuration.GetSection("").Value));
+            services.Configure<JwtOptions>(configuration.GetSection("JwtOptions"));
 
-            services.AddIdentityCore<User>(options =>
+            services.AddDbContext<EventAppDbContext>(options =>
+                options.UseSqlServer(configuration.GetSection("DbConnectionString").Value));
+
+            services.AddIdentity<User, IdentityRole>(options =>
             {
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireDigit = true;
@@ -37,13 +50,20 @@ namespace EventApp.DI
                 .AddEntityFrameworkStores<EventAppDbContext>()
                 .AddSignInManager<SignInManager<User>>()
                 .AddUserManager<UserManager<User>>()
+                .AddDefaultTokenProviders()
                 .AddRoles<IdentityRole>();
 
-            services.AddAuthorizationBuilder()
-                .AddPolicy("AdminPolicy", options => {
-                    options.RequireAuthenticatedUser();
-                    options.RequireRole("admin");
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminPolicy", policy =>
+                {
+                    policy.RequireRole("Admin");
                 });
+                options.AddPolicy("UserPolicy", policy =>
+                {
+                    policy.RequireRole("User");
+                });
+            });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
@@ -59,6 +79,50 @@ namespace EventApp.DI
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = jwtOptions.GetSymmetricSecurityKey()
                 };
+            });
+
+            services.AddTransient<IEventRepository, EventRepository>();
+
+            services.AddTransient<IEventService, EventService>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<IImageService, ImageService>();
+
+            services.AddTransient<IValidator<User>, UserValidator>();
+            services.AddTransient<IValidator<Event>, EventValidator>();
+
+            services.AddAutoMapper(typeof(AutoMapperProfile));
+
+            services.AddControllers();
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen(opt =>
+            {
+                opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MindTrackerAPI", Version = "v1" });
+                opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please enter token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "bearer"
+                });
+                opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type=ReferenceType.SecurityScheme,
+                                Id="Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                opt.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });
         }
     }

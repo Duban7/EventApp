@@ -4,6 +4,7 @@ using Data.Interfaces;
 using Data.Models;
 using Data.Repositories;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Services.DTOs;
 using Services.Interfaces;
@@ -15,19 +16,17 @@ namespace Services.Services
         private readonly IEventRepository _eventRepository;
         private readonly IValidator<Event> _eventValidator;
         private readonly IMapper _mapper;
+        private readonly IImageService _imageService;
         public EventService(IEventRepository eventRepository,
                             IValidator<Event> eventValidator,
-                            IMapper mapper) 
+                            IMapper mapper,
+                            IImageService imageService) 
         {
             _eventRepository = eventRepository;
             _eventValidator = eventValidator;
             _mapper = mapper;
+            _imageService = imageService;
         }
-        public Task<string> AddImageToEvent(string eventId, object obj)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<Event> CreateEvent(Event newEvent)
         {
             _eventValidator.ValidateAndThrow(newEvent);
@@ -68,11 +67,6 @@ namespace Services.Services
         public async Task<PaginatedList<Event>> GetEvents(int pageIndex, int PageSize) =>
             (await _eventRepository.GetEvents(pageIndex, PageSize)) ?? throw new Exception("Event not found");
 
-        public Task RemoveImageFromEvent(string eventId)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<Event> UpdateEvent(Event updatedEvent)
         {
             _eventValidator.ValidateAndThrow(updatedEvent);
@@ -97,6 +91,45 @@ namespace Services.Services
             Event? resEvent = (await _eventRepository.UpdateEvent(foundEvent)) ?? throw new Exception("event wasn't created"); ;
 
             return resEvent;
+        }
+        public async Task RemoveImageFromEvent(string eventId)
+        {
+            Event? foundEvent = await _eventRepository.GetEventById(eventId);
+            if (foundEvent == null) throw new Exception("Event not found");
+            if (foundEvent.ImagePath == null) throw new Exception("Event doesn't have image");
+
+            _imageService.DeleteImage(foundEvent.ImagePath);
+
+            foundEvent.ImagePath = null;
+
+            await _eventRepository.UpdateEvent(foundEvent);
+        }
+        public async Task AddImageToEvent(string eventId, IFormFile imageFile)
+        {
+            Event? foundEvent = await _eventRepository.GetEventById(eventId);
+            if (foundEvent == null) throw new Exception("Event not found");
+
+            foundEvent.ImagePath = await _imageService.SaveImageAsync(imageFile);
+
+            await _eventRepository.UpdateEvent(foundEvent);
+        }
+
+        public async Task<(FileStream, string)> GetImage(string eventId)
+        {
+
+            Event? foundEvent = await _eventRepository.GetEventById(eventId);
+            if (foundEvent == null) throw new Exception("Event not found");
+            if (foundEvent.ImagePath == null) throw new Exception("Event doesn't have image");
+
+            string ext;
+            FileStream imageFile;
+         
+            (imageFile,ext) = _imageService.GetImageStream(foundEvent.ImagePath);
+            if (ext == null || imageFile == null) throw new Exception("Couldn't open filestream or get file extention");
+            
+            ext = $"image/{ext.TrimStart('.').ToLower()}";
+            
+            return (imageFile,ext);
         }
     }
 }

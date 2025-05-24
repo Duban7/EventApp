@@ -21,7 +21,7 @@ namespace Services.Services
         {
             JwtSecurityToken jwt = new(
                 claims: claims,
-                expires: DateTime.UtcNow.Add(TimeSpan.FromHours(16)),
+                expires: DateTime.UtcNow.Add(TimeSpan.FromDays(1)),
                 signingCredentials: new SigningCredentials(_jwtOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
             string encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);

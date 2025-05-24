@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Services.DTOs;
 using Services.Interfaces;
+using System.Security.Claims;
 
 namespace Services.Services
 {
@@ -15,20 +16,23 @@ namespace Services.Services
         private readonly UserManager<User> _userManager;
         private readonly IValidator<User> _userValidator;
         private readonly IEventRepository _eventRepository;
+        private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
         public UserService(UserManager<User> userManager,
                            SignInManager<User> signInManager,
                            IValidator<User> userValidator,
                            IEventRepository eventRepository,
+                           ITokenService tokenService,
                            IMapper mapper) 
         {
             _userManager = userManager;
             _signInManager = signInManager;            _userValidator = userValidator;
             _eventRepository = eventRepository;
+            _tokenService = tokenService;
             _mapper = mapper;
         }
 
-        public async Task<UserDTO?> CreateUser(LogInUserDTO newUserDTO)
+        public async Task<UserTokenDTO> CreateUser(SignUpUserDTO newUserDTO)
         {
             User newUser = _mapper.Map<User>(newUserDTO);
             string password = newUserDTO.Password ?? throw new Exception("Password wasn't sent");
@@ -38,14 +42,33 @@ namespace Services.Services
             User? foundUser = await _userManager.FindByEmailAsync(newUser.Email!);
             if (foundUser != null) throw new Exception("User already exists");
 
+            newUser.RefreshToken = _tokenService.GenerateRefreshToken();
+            newUser.RefreshExpires = DateTime.Now.AddDays(7);
+
             var res = await _userManager.CreateAsync(newUser, password);
             if (!res.Succeeded) throw new Exception("Couldn't create User");
 
-            foundUser =  await _userManager.FindByEmailAsync(newUser.Email!) ?? throw new Exception("User not found");
-            
-            UserDTO userDTO = _mapper.Map<UserDTO>(foundUser);
+            foundUser = await _userManager.FindByEmailAsync(newUser.Email!) ?? throw new Exception("User not found");
 
-            return userDTO;
+            Claim[] userClaims = [
+
+                new Claim(ClaimTypes.NameIdentifier, foundUser.Id!),
+                new Claim(ClaimTypes.Email, foundUser.Email!),
+                new Claim(ClaimTypes.Name, foundUser.Name!),
+                new Claim(ClaimTypes.Role, "User")
+                ];
+
+            res = await _userManager.AddClaimsAsync(foundUser, userClaims);
+            if (!res.Succeeded) throw new Exception("Couldn't add Claims");
+
+            UserDTO userDTO = _mapper.Map<UserDTO>(foundUser);
+            UserTokenDTO userTokenDTO = new();
+            var claims = await this.GetUserClaims(newUser.Id);
+
+            userTokenDTO.User = userDTO;
+            userTokenDTO.Token = _tokenService.GenerateAccesToken(claims);
+
+            return userTokenDTO;
         }
 
         public async Task DeleteUser(string userId)
@@ -69,7 +92,11 @@ namespace Services.Services
 
         public async Task<List<UserDTO>?> GetUsersByEventId(string eventId)
         {
-            List<User> foundUsers = await _userManager.Users.Where(u=>u.Events.Any(e=>e.Id == eventId)).ToListAsync<User>();
+            List<User> foundUsers = await _userManager.Users
+                .Where(u => u.EventParticipations.Any(ep => ep.EventId == eventId))
+                .Include(u => u.EventParticipations.Where(ep => ep.EventId == eventId))
+                .ToListAsync();
+
             if (foundUsers.Count <= 0 ) throw new Exception("User not found");
 
             List<UserDTO> userDTO = foundUsers.Select(_mapper.Map<User, UserDTO>).ToList();
@@ -77,7 +104,7 @@ namespace Services.Services
             return userDTO;
         }
 
-        public async Task<UserDTO?> LogIn(string email, string password)
+        public async Task<UserDTO> LogIn(string email, string password)
         {
             var res = await _signInManager.PasswordSignInAsync(email, password, true, false);
             if(!res.Succeeded) throw new Exception("Invalid email or password");
@@ -140,5 +167,27 @@ namespace Services.Services
 
             return userDTO;
         }
+
+        public async Task<UserDTO> UpdateRefreshToken(string oldToken, string userId)
+        {
+            User? foundUser = await _userManager.FindByIdAsync(userId);
+            if (foundUser == null) throw new Exception("User not found");
+            if (foundUser.RefreshToken != oldToken) throw new Exception("Token is expired");
+            if (foundUser.RefreshExpires < DateTime.Now) throw new Exception("Token is expired");
+
+            foundUser.RefreshToken = _tokenService.GenerateRefreshToken();
+
+            UserDTO userDTO = _mapper.Map<UserDTO>(foundUser);
+
+            return userDTO;
+        }
+
+        public async Task<IList<Claim>> GetUserClaims(string userId)
+        {
+            User? user = await _userManager.FindByIdAsync(userId);
+            if (user == null) throw new Exception("Couldn't find user in claimsGet");
+
+            return await _userManager.GetClaimsAsync(user);
+        } 
     }
 }

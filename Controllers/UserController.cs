@@ -25,20 +25,15 @@ namespace EventApp.Controllers
 
         [HttpPost]
         [Route("/sign-up")]
-        public async Task<ActionResult<UserTokenDTO>> CreateUser([FromForm] LogInUserDTO userDTO)
+        public async Task<ActionResult<UserTokenDTO>> CreateUser([FromForm] SignUpUserDTO userDTO)
         {
-            UserDTO? newUser = await _userService.CreateUser(userDTO);
+            UserTokenDTO newUser = await _userService.CreateUser(userDTO);
 
-            UserTokenDTO res = new();
-            res.User = newUser;
-            res.User.RefreshToken = _tokenService.GenerateRefreshToken();
-            res.Token = _tokenService.GenerateAccesToken(GetUserClaims(res.User));
-
-            return Ok(res);
+            return Ok(newUser);
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Policy = "UserPolicy")]
         [Route("/update-user")]
         public async Task<ActionResult<UserDTO>> UpdateUser([FromBody] UserDTO userDTO)
         {
@@ -46,7 +41,7 @@ namespace EventApp.Controllers
         }
 
         [HttpDelete]
-        [Authorize]
+        [Authorize(Policy = "UserPolicy")]
         [Route("/delete-user")]
         public async Task<ActionResult> DeleteUser()
         {
@@ -59,12 +54,11 @@ namespace EventApp.Controllers
         [Route("/log-in")]
         public async Task<ActionResult<UserTokenDTO>> LogIn([FromForm] LogInUserDTO userDTO)
         {
-            UserDTO? foundUser = await _userService.LogIn(userDTO.Email, userDTO.Password);
+            UserDTO foundUser = await _userService.LogIn(userDTO.Email, userDTO.Password);
             UserTokenDTO res = new();
+            var claims = await _userService.GetUserClaims(foundUser.Id);
 
-            res.User = foundUser;
-            res.User.RefreshToken = _tokenService.GenerateRefreshToken();
-            res.Token = _tokenService.GenerateAccesToken(GetUserClaims(res.User));
+            res.Token = _tokenService.GenerateAccesToken(claims);
 
             return Ok(res);
         }
@@ -79,7 +73,7 @@ namespace EventApp.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Policy = "UserPolicy")]
         [Route("/get-user/{userId}")]
         public async Task<ActionResult<UserDTO>> GetUser(string userId)
         {
@@ -89,6 +83,7 @@ namespace EventApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "UserPolicy")]
         [Route("/reg-user-event/{eventId}")]
         public async Task<ActionResult> RegUserEvent(string eventId)
         {
@@ -98,6 +93,7 @@ namespace EventApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "UserPolicy")]
         [Route("/unreg-user-event/{eventId}")]
         public async Task<ActionResult> UnregUserEvent(string eventId)
         {
@@ -107,14 +103,17 @@ namespace EventApp.Controllers
         }
 
         [HttpPost]
-        [Route("/refresh-token")]
+        [Route("/refresh-token/{userId}")]
+        public async Task<ActionResult<UserTokenDTO>> Refresh([FromBody] string oldRFToken, string userId)
+        {
+            UserDTO foundUser = await _userService.UpdateRefreshToken(oldRFToken, userId);
+            UserTokenDTO res = new();
+            var claims = await _userService.GetUserClaims(foundUser.Id);
 
-        private List<Claim> GetUserClaims(UserDTO user) => new()
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id!),
-                new Claim(ClaimTypes.Email, user.Email!),
-                new Claim(ClaimTypes.Name, user.Name!)
-            };
+            res.Token = _tokenService.GenerateAccesToken(claims);
+
+            return Ok(res);
+        }
 
         private string GetUserId() =>
              this.User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value ?? throw new Exception("User not found");

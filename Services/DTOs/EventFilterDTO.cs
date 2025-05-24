@@ -1,6 +1,6 @@
 ﻿namespace Services.DTOs
 {
-    public record class EventFilterDTO
+    public class EventFilterDTO
     {
         public string? Category { get; set; }
         public DateTime? StartDate { get; set; }
