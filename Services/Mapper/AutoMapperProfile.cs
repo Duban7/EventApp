@@ -1,0 +1,42 @@
+﻿using AutoMapper;
+using Data.Models;
+using Services.DTOs;
+
+namespace Services.Mapper
+{
+    public class AutoMapperProfile : Profile
+    {
+        public AutoMapperProfile()
+        {
+            CreateMap<UserDTO, User>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.RefreshToken, opt => opt.Ignore())
+                .ForMember(dest => dest.RefreshExpires, opt => opt.Ignore())
+                .ForMember(dest => dest.Surname, opt => opt.MapFrom(src => src.Surname))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.BirthDate, opt => opt.MapFrom(src => src.BirthDate));
+
+            CreateMap<LogInUserDTO, User>()
+                .ForMember(dest => dest.Surname, opt => opt.MapFrom(src => src.Surname))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.BirthDate, opt => opt.MapFrom(src => src.BirthDate));
+
+            CreateMap<User, UserDTO>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Surname, opt => opt.MapFrom(src => src.Surname))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.BirthDate, opt => opt.MapFrom(src => src.BirthDate))
+                .ForMember(dest => dest.RefreshToken, opt => opt.MapFrom(src => src.RefreshToken))
+                .ForMember(dest => dest.RefreshExpires, opt => opt.MapFrom(src => src.RefreshExpires));
+
+            CreateMap<EventFilterDTO, Event>()
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
+                .ForMember(dest => dest.EventPlace, opt => opt.MapFrom(src => src.EventPlace))
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate));
+
+        }
+    }
+}

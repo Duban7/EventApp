@@ -1,15 +1,16 @@
 ﻿using Data.Models;
+using Services.DTOs;
 
 namespace Services.Interfaces
 {
     public interface IUserService
     {
-        public Task<User?> CreateUser(User newUser);
-        public Task<User?> UpdateUser(User updatedUser);
+        public Task<UserDTO?> CreateUser(LogInUserDTO newUserDTO);
+        public Task<UserDTO?> UpdateUser(UserDTO updatedUserDTO);
         public Task DeleteUser(string userId);
-        public Task<User?> LogIn(string email, string password);
-        public Task<User?> GetUserById(string userId);
-        public Task<List<User>?> GetUsersByEventId(string eventId);
+        public Task<UserDTO?> LogIn(string email, string password);
+        public Task<UserDTO?> GetUserById(string userId);
+        public Task<List<UserDTO>?> GetUsersByEventId(string eventId);
         public Task RegisterUserInEvent(string userId, string eventId);
         public Task UnregisterUserInEvent(string userId, string eventId);
     }

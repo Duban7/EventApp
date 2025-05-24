@@ -2,9 +2,6 @@
 using Data.Interfaces;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Data.Repositories
 {

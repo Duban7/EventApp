@@ -1,9 +1,11 @@
 ﻿
+using AutoMapper;
 using Data.Interfaces;
 using Data.Models;
 using Data.Repositories;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using Services.DTOs;
 using Services.Interfaces;
 
 namespace Services.Services
@@ -12,18 +14,21 @@ namespace Services.Services
     {
         private readonly IEventRepository _eventRepository;
         private readonly IValidator<Event> _eventValidator;
+        private readonly IMapper _mapper;
         public EventService(IEventRepository eventRepository,
-                            IValidator<Event> eventValidator) 
+                            IValidator<Event> eventValidator,
+                            IMapper mapper) 
         {
             _eventRepository = eventRepository;
             _eventValidator = eventValidator;
+            _mapper = mapper;
         }
         public Task<string> AddImageToEvent(string eventId, object obj)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<Event?> CreateEvent(Event newEvent)
+        public async Task<Event> CreateEvent(Event newEvent)
         {
             _eventValidator.ValidateAndThrow(newEvent);
 
@@ -36,7 +41,7 @@ namespace Services.Services
             return createdEvent;
         }
 
-        public async Task DeleteEven(string eventId)
+        public async Task DeleteEvent(string eventId)
         {
             Event? foundEvent = (await _eventRepository.GetEventById(eventId)) ?? throw new Exception("Event not found");
 
@@ -50,8 +55,15 @@ namespace Services.Services
         public async Task<Event> GetEventByName(string name) =>
             (await _eventRepository.GetEventByName(name)) ?? throw new Exception("Event not found");
 
-        public async Task<PaginatedList<Event>> GetEventFiltered(Event filter, int pageIndex, int PageSize) =>
-            (await _eventRepository.GetEventsFiltered(filter, pageIndex, PageSize)) ?? throw new Exception("Event not found");
+        public async Task<PaginatedList<Event>> GetEventsFiltered(EventFilterDTO filterDTO, int pageIndex, int PageSize)
+        {
+            Event filter = _mapper.Map<Event>(filterDTO);
+
+            var res = await _eventRepository.GetEventsFiltered(filter, pageIndex, PageSize);
+            if (res == null) throw new Exception("Events not found");
+
+            return res;
+        }
 
         public async Task<PaginatedList<Event>> GetEvents(int pageIndex, int PageSize) =>
             (await _eventRepository.GetEvents(pageIndex, PageSize)) ?? throw new Exception("Event not found");
@@ -61,9 +73,11 @@ namespace Services.Services
             throw new NotImplementedException();
         }
 
-        public async Task<Event?> UpdateEvent(Event updatedEvent)
+        public async Task<Event> UpdateEvent(Event updatedEvent)
         {
             _eventValidator.ValidateAndThrow(updatedEvent);
+
+            if (updatedEvent.Id == null) throw new Exception("Event id wan't sent");
 
             Event? foundEvent = await _eventRepository.GetEventById(updatedEvent.Id);
 
