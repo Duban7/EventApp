@@ -44,6 +44,7 @@ namespace Services.Services
 
             newUser.RefreshToken = _tokenService.GenerateRefreshToken();
             newUser.RefreshExpires = DateTime.Now.AddDays(7);
+            newUser.UserName = newUser.Email;
 
             var res = await _userManager.CreateAsync(newUser, password);
             if (!res.Succeeded) throw new Exception("Couldn't create User");
@@ -60,6 +61,9 @@ namespace Services.Services
 
             res = await _userManager.AddClaimsAsync(foundUser, userClaims);
             if (!res.Succeeded) throw new Exception("Couldn't add Claims");
+
+            res = await _userManager.AddToRoleAsync(foundUser, "User");
+            if (!res.Succeeded) throw new Exception("Couldn't add Relo");
 
             UserDTO userDTO = _mapper.Map<UserDTO>(foundUser);
             UserTokenDTO userTokenDTO = new();
@@ -90,14 +94,14 @@ namespace Services.Services
             return userDTO;
         }
 
-        public async Task<List<UserDTO>?> GetUsersByEventId(string eventId)
+        public async Task<List<UserDTO>?> GetUsersByEventId(int eventId)
         {
             List<User> foundUsers = await _userManager.Users
                 .Where(u => u.EventParticipations.Any(ep => ep.EventId == eventId))
                 .Include(u => u.EventParticipations.Where(ep => ep.EventId == eventId))
                 .ToListAsync();
 
-            if (foundUsers.Count <= 0 ) throw new Exception("User not found");
+            if (foundUsers.Count <= 0 ) return [];
 
             List<UserDTO> userDTO = foundUsers.Select(_mapper.Map<User, UserDTO>).ToList();
 
@@ -112,12 +116,18 @@ namespace Services.Services
             User? foundUser = await _userManager.FindByEmailAsync(email);
             if (foundUser == null) throw new Exception("User not found");
 
+            foundUser.RefreshToken = _tokenService.GenerateRefreshToken();
+            foundUser.RefreshExpires = DateTime.Now.AddDays(7);
+
+            var updateRes = await _userManager.UpdateAsync(foundUser);
+            if (!updateRes.Succeeded) throw new Exception("couldn't update refresh token");
+
             UserDTO userDTO = _mapper.Map<UserDTO>(foundUser);
 
             return userDTO;
         }
 
-        public async Task RegisterUserInEvent(string userId, string eventId)
+        public async Task RegisterUserInEvent(string userId, int eventId)
         {
             User? foundUser = await _userManager.FindByIdAsync(userId);
             if (foundUser == null) throw new Exception("User not found");
@@ -130,7 +140,7 @@ namespace Services.Services
             await _eventRepository.UpdateEvent(foundEvent);
         }
 
-        public async Task UnregisterUserInEvent(string userId, string eventId)
+        public async Task UnregisterUserInEvent(string userId, int eventId)
         {
             User? foundUser = await _userManager.FindByIdAsync(userId);
             if (foundUser == null) throw new Exception("User not found");

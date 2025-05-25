@@ -30,7 +30,7 @@ namespace Data.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<List<User>> GetUsersByEventId(string eventId)
+        public Task<List<User>> GetUsersByEventId(int eventId)
         {
             throw new NotImplementedException();
         }

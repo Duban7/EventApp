@@ -11,9 +11,9 @@ namespace Services.Interfaces
         public Task DeleteUser(string userId);
         public Task<UserDTO> LogIn(string email, string password);
         public Task<UserDTO?> GetUserById(string userId);
-        public Task<List<UserDTO>?> GetUsersByEventId(string eventId);
-        public Task RegisterUserInEvent(string userId, string eventId);
-        public Task UnregisterUserInEvent(string userId, string eventId);
+        public Task<List<UserDTO>?> GetUsersByEventId(int eventId);
+        public Task RegisterUserInEvent(string userId, int eventId);
+        public Task UnregisterUserInEvent(string userId, int eventId);
         public Task<UserDTO> UpdateRefreshToken(string oldToken, string userId);
         public Task<IList<Claim>> GetUserClaims(string userId);
     }

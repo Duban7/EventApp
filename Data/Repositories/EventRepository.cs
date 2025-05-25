@@ -13,19 +13,17 @@ namespace Data.Repositories
             _context = context;
         }
 
-        public Task<Event?> CreateEvent(Event newEvent)
+        public async Task CreateEvent(Event newEvent)
         {
             _context.Events.Add(newEvent);
-            _context.SaveChangesAsync();
-
-            return _context.Events.FirstOrDefaultAsync(e => e.Name == newEvent.Name);
+            await _context.SaveChangesAsync();
         }
 
-        public Task DeleteEvent(string eventId)
+        public async Task DeleteEvent(int eventId)
         {
-          return _context.Events.Where(e => e.Id == eventId).ExecuteDeleteAsync();
+          await _context.Events.Where(e => e.Id == eventId).ExecuteDeleteAsync();
         }
-        public Task<Event?> GetEventById(string eventId)=>
+        public Task<Event?> GetEventById(int eventId)=>
             _context.Events.Where(e=>e.Id==eventId).Include(e=>e.Participants).FirstOrDefaultAsync();
         
 
@@ -51,6 +49,8 @@ namespace Data.Repositories
         {
             var query = _context.Events.AsQueryable<Event>();
 
+            var list = query.ToList();
+
             if (filter.Category != null)
                 query = query.Where(x => x.Category == filter.Category);
             if (filter.StartDate.HasValue)
@@ -71,12 +71,12 @@ namespace Data.Repositories
             return new PaginatedList<Event>(events, pageIndex, totalPages);
         }
 
-        public Task<Event?> UpdateEvent(Event updatedEvent)
+        public async Task<Event?> UpdateEvent(Event updatedEvent)
         {
             _context.Events.Update(updatedEvent);
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-            return _context.Events.FirstOrDefaultAsync(e => e.Name == updatedEvent.Name);
+            return await _context.Events.FirstOrDefaultAsync(e => e.Name == updatedEvent.Name);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Data.Interfaces;
 using Data.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.DTOs;
@@ -31,7 +32,7 @@ namespace EventApp.Controllers
 
         [HttpGet]
         [Route("/event/get-filtered")]
-        public async Task<ActionResult<PaginatedList<Event>>> GetEvents([FromBody]EventFilterDTO filterDTO, int pageIndex, int pageSize)
+        public async Task<ActionResult<PaginatedList<Event>>> GetEvents([FromQuery]EventFilterDTO filterDTO, int pageIndex, int pageSize)
         {
             var res = await _eventService.GetEventsFiltered(filterDTO,pageIndex, pageSize);
 
@@ -40,7 +41,7 @@ namespace EventApp.Controllers
 
         [HttpGet]
         [Route("/event/{eventId}")]
-        public async Task<ActionResult<Event>> GetEventById(string eventId)
+        public async Task<ActionResult<Event>> GetEventById(int eventId)
         {
             Event res = await _eventService.GetEventById(eventId);
 
@@ -51,13 +52,13 @@ namespace EventApp.Controllers
         [Route("/event/name-{eventName}")]
         public async Task<ActionResult<Event>> GetEventByName(string eventName)
         {
-            Event res = await _eventService.GetEventById(eventName);
+            Event res = await _eventService.GetEventByName(eventName);
 
             return Ok(res);
         }
 
         [HttpPost]
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
         [Route("/event/add")]
         public async Task<ActionResult<Event>> AddEvent(Event newEvent)
         {
@@ -67,7 +68,7 @@ namespace EventApp.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
         [Route("/event/update")]
         public async Task<ActionResult<Event>> UpdateEvent(Event updatedEvent)
         {
@@ -77,9 +78,9 @@ namespace EventApp.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
         [Route("/event/{eventId}")]
-        public async Task<ActionResult> DeleteEvent(string eventId)
+        public async Task<ActionResult> DeleteEvent(int eventId)
         {
             await _eventService.DeleteEvent(eventId);
 
@@ -87,9 +88,9 @@ namespace EventApp.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
         [Route("event/{eventId}/image")]
-        public async Task<ActionResult> AddImageToEvent([FromForm] ImageDTO imageDTO, string eventId)
+        public async Task<ActionResult> AddImageToEvent([FromForm] ImageDTO imageDTO, int eventId)
         {
             await _eventService.AddImageToEvent(eventId, imageDTO.imageFile);
 
@@ -97,9 +98,9 @@ namespace EventApp.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
         [Route("event/{eventId}/image")]
-        public async Task<ActionResult> RemoveImageFromEvent(string eventId)
+        public async Task<ActionResult> RemoveImageFromEvent(int eventId)
         {
             await _eventService.RemoveImageFromEvent(eventId);
 
@@ -108,7 +109,7 @@ namespace EventApp.Controllers
 
         [HttpGet]
         [Route("event/{eventId}/image")]
-        public async Task<ActionResult> GetEventImage(string eventId)
+        public async Task<ActionResult> GetEventImage(int eventId)
         {
             string cType;
             FileStream imageFile;

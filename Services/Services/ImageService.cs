@@ -7,7 +7,7 @@ namespace Services.Services
 {
     public class ImageService : IImageService
     {
-        private readonly string[] allowedFileExtensions = ["png", "jpg", "jpeg"];
+        private readonly string[] allowedFileExtensions = [".png", ".jpg", ".jpeg"];
         private readonly string rootPath;
         public ImageService(IWebHostEnvironment environment)
         {

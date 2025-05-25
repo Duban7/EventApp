@@ -35,19 +35,21 @@ namespace Services.Services
 
             if (foundEvent != null) throw new Exception("Event already exists");
 
-            Event createdEvent = (await _eventRepository.CreateEvent(newEvent)) ?? throw new Exception("event wasn't created");
+            await _eventRepository.CreateEvent(newEvent);
+
+            Event createdEvent = (await _eventRepository.GetEventByName(newEvent.Name)) ?? throw new Exception("event wasn't created");
 
             return createdEvent;
         }
 
-        public async Task DeleteEvent(string eventId)
+        public async Task DeleteEvent(int eventId)
         {
             Event? foundEvent = (await _eventRepository.GetEventById(eventId)) ?? throw new Exception("Event not found");
 
             await _eventRepository.DeleteEvent(eventId); 
         }
 
-        public async Task<Event> GetEventById(string eventId)=>
+        public async Task<Event> GetEventById(int eventId)=>
             (await _eventRepository.GetEventById(eventId)) ?? throw new Exception("Event not found");
 
 
@@ -88,11 +90,11 @@ namespace Services.Services
             if (updatedEvent.MaxParticipantsCount != null)
                 foundEvent.MaxParticipantsCount = updatedEvent.MaxParticipantsCount;
 
-            Event? resEvent = (await _eventRepository.UpdateEvent(foundEvent)) ?? throw new Exception("event wasn't created"); ;
+            Event? resEvent = (await _eventRepository.UpdateEvent(foundEvent)) ?? throw new Exception("event wasn't created"); 
 
             return resEvent;
         }
-        public async Task RemoveImageFromEvent(string eventId)
+        public async Task RemoveImageFromEvent(int eventId)
         {
             Event? foundEvent = await _eventRepository.GetEventById(eventId);
             if (foundEvent == null) throw new Exception("Event not found");
@@ -104,7 +106,7 @@ namespace Services.Services
 
             await _eventRepository.UpdateEvent(foundEvent);
         }
-        public async Task AddImageToEvent(string eventId, IFormFile imageFile)
+        public async Task AddImageToEvent(int eventId, IFormFile imageFile)
         {
             Event? foundEvent = await _eventRepository.GetEventById(eventId);
             if (foundEvent == null) throw new Exception("Event not found");
@@ -114,7 +116,7 @@ namespace Services.Services
             await _eventRepository.UpdateEvent(foundEvent);
         }
 
-        public async Task<(FileStream, string)> GetImage(string eventId)
+        public async Task<(FileStream, string)> GetImage(int eventId)
         {
 
             Event? foundEvent = await _eventRepository.GetEventById(eventId);

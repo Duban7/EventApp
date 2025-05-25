@@ -13,13 +13,13 @@ namespace Services.Interfaces
     {
         public Task<Event> CreateEvent(Event newEvent);
         public Task<Event> UpdateEvent(Event updatedEvent);
-        public Task DeleteEvent(string eventId);
-        public Task<Event> GetEventById(string eventId);
+        public Task DeleteEvent(int eventId);
+        public Task<Event> GetEventById(int eventId);
         public Task<Event> GetEventByName(string name);
         public Task<PaginatedList<Event>> GetEvents(int pageIndex, int PageSize);
         public Task<PaginatedList<Event>> GetEventsFiltered(EventFilterDTO filter, int pageIndex, int PageSize);
-        public Task AddImageToEvent(string eventId, IFormFile imageFile);
-        public Task RemoveImageFromEvent(string eventId);
-        public Task<(FileStream, string)> GetImage(string eventId); 
+        public Task AddImageToEvent(int eventId, IFormFile imageFile);
+        public Task RemoveImageFromEvent(int eventId);
+        public Task<(FileStream, string)> GetImage(int eventId); 
     }
 }

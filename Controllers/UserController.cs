@@ -1,4 +1,4 @@
-﻿using Data.Models;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.DTOs;
@@ -33,7 +33,7 @@ namespace EventApp.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "UserPolicy")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "UserPolicy")]
         [Route("/update-user")]
         public async Task<ActionResult<UserDTO>> UpdateUser([FromBody] UserDTO userDTO)
         {
@@ -41,7 +41,7 @@ namespace EventApp.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Policy = "UserPolicy")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "UserPolicy")]
         [Route("/delete-user")]
         public async Task<ActionResult> DeleteUser()
         {
@@ -58,6 +58,7 @@ namespace EventApp.Controllers
             UserTokenDTO res = new();
             var claims = await _userService.GetUserClaims(foundUser.Id);
 
+            res.User = foundUser;
             res.Token = _tokenService.GenerateAccesToken(claims);
 
             return Ok(res);
@@ -65,7 +66,7 @@ namespace EventApp.Controllers
 
         [HttpGet]
         [Route("/get-event-participants/{eventId}")]
-        public async Task<ActionResult<List<UserDTO>>> GetEventParticipants(string eventId)
+        public async Task<ActionResult<List<UserDTO>>> GetEventParticipants(int eventId)
         {
             List<UserDTO>? foundUsers = await _userService.GetUsersByEventId(eventId);
 
@@ -73,7 +74,7 @@ namespace EventApp.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "UserPolicy")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "UserPolicy")]
         [Route("/get-user/{userId}")]
         public async Task<ActionResult<UserDTO>> GetUser(string userId)
         {
@@ -83,9 +84,9 @@ namespace EventApp.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "UserPolicy")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "UserPolicy")]
         [Route("/reg-user-event/{eventId}")]
-        public async Task<ActionResult> RegUserEvent(string eventId)
+        public async Task<ActionResult> RegUserEvent(int eventId)
         {
             await _userService.RegisterUserInEvent(GetUserId(), eventId);
 
@@ -93,9 +94,9 @@ namespace EventApp.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "UserPolicy")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "UserPolicy")]
         [Route("/unreg-user-event/{eventId}")]
-        public async Task<ActionResult> UnregUserEvent(string eventId)
+        public async Task<ActionResult> UnregUserEvent(int eventId)
         {
             await _userService.UnregisterUserInEvent(GetUserId(), eventId);
 
@@ -110,6 +111,7 @@ namespace EventApp.Controllers
             UserTokenDTO res = new();
             var claims = await _userService.GetUserClaims(foundUser.Id);
 
+            res.User = foundUser;
             res.Token = _tokenService.GenerateAccesToken(claims);
 
             return Ok(res);

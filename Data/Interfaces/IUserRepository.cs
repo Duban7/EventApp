@@ -8,6 +8,6 @@ namespace Data.Interfaces
         public Task UpdateUser(User updatedUser);
         public Task DeleteUser(string userId);
         public Task<User> GetUserById(string userId);
-        public Task<List<User>> GetUsersByEventId(string eventId);
+        public Task<List<User>> GetUsersByEventId(int eventId);
     }
 }
