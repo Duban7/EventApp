@@ -67,6 +67,7 @@ namespace Data.Migrations
                     EventPlace = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MaxParticipantsCount = table.Column<int>(type: "int", nullable: false),
+                    IsFull = table.Column<bool>(type: "bit", nullable: false),
                     ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>

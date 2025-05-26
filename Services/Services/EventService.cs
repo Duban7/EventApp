@@ -114,8 +114,17 @@ namespace Services.Services
                 foundEvent.Category = updatedEvent.Category;
             if (updatedEvent.EventPlace != null)
                 foundEvent.EventPlace = updatedEvent.EventPlace;
-            if (updatedEvent.MaxParticipantsCount != null)
-                foundEvent.MaxParticipantsCount = updatedEvent.MaxParticipantsCount;
+            if (updatedEvent.MaxParticipantsCount != null) 
+            {
+                int ParticipantsCount = await _eventRepository.GetEventParticipantsCount(updatedEvent.Id);
+                if (updatedEvent.MaxParticipantsCount < ParticipantsCount)
+                    throw new BadRequestException("You couldn't set max participant count less than real participants count");
+                if (updatedEvent.MaxParticipantsCount == ParticipantsCount)
+                    foundEvent.IsFull = true;
+                if (foundEvent.IsFull && updatedEvent.MaxParticipantsCount > ParticipantsCount)
+                    foundEvent.IsFull = false;
+                foundEvent.MaxParticipantsCount = updatedEvent.MaxParticipantsCount; 
+            }
 
             Event? resEvent = (await _eventRepository.UpdateEvent(foundEvent)) ?? throw new InternalErrorException("event wasn't updated");
 

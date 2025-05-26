@@ -1,5 +1,7 @@
 ﻿using Data.Models;
 using FluentValidation;
+using FluentValidation.Results;
+using Services.Exeptions;
 
 namespace Services.Validators
 {
@@ -14,7 +16,15 @@ namespace Services.Validators
                 .Length(4, 40).WithMessage(lengthMsg);
 
             RuleFor(e => e.StartDate)
-                .Must(sd=>sd.Value>DateTime.Now).WithMessage(msg);
+                .Must(sd => sd.Value > DateTime.Now).WithMessage(msg);
+
+            RuleFor(e => e.MaxParticipantsCount)
+                .Must(mp => 3 < mp && mp < 300).WithMessage(msg);
+        }
+        protected override void RaiseValidationException(ValidationContext<Event> context, ValidationResult result)
+        {
+            var firstError = result.Errors[0];
+            throw new BadRequestException(firstError.ErrorMessage);
         }
     }
 }

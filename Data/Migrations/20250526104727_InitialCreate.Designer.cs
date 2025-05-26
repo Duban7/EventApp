@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(EventAppDbContext))]
-    [Migration("20250525155501_InitialCreate")]
+    [Migration("20250526104727_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -46,6 +46,9 @@ namespace Data.Migrations
 
                     b.Property<string>("ImagePath")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsFull")
+                        .HasColumnType("bit");
 
                     b.Property<int>("MaxParticipantsCount")
                         .HasColumnType("int");

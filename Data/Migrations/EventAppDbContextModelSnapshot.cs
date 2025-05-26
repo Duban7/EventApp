@@ -44,6 +44,9 @@ namespace Data.Migrations
                     b.Property<string>("ImagePath")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsFull")
+                        .HasColumnType("bit");
+
                     b.Property<int>("MaxParticipantsCount")
                         .HasColumnType("int");
 

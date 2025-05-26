@@ -61,6 +61,7 @@ namespace Services.Mapper
                 .ForMember(dest => dest.EventPlace, opt => opt.MapFrom(src => src.EventPlace))
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
                 .ForMember(dest => dest.MaxParticipantsCount, opt => opt.MapFrom(src => src.MaxParticipantsCount))
+                .ForMember(dest => dest.IsFull, opt => opt.MapFrom(src => src.IsFull))
                 .ForMember(dest => dest.ImagePath, opt => opt.MapFrom(src => src.ImagePath));
 
         }

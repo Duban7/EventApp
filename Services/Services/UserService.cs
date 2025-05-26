@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Services.DTOs;
 using Services.Exeptions;
 using Services.Interfaces;
+using Services.Validators;
 using System.Security.Claims;
 
 namespace Services.Services
@@ -40,6 +41,7 @@ namespace Services.Services
             string password = newUserDTO.Password ?? throw new BadRequestException("Password wasn't sent");
 
             _userValidator.ValidateAndThrow(newUser);
+            if (!UserValidator.IsPasswordValid(password)) throw new BadRequestException("Password should contain at least 1 letter and 1 number. Minimal password length - 6, max - 100."); 
 
             User? foundUser = await _userManager.FindByEmailAsync(newUser.Email!);
             if (foundUser != null) throw new ConflictException("User already exists");
@@ -143,8 +145,13 @@ namespace Services.Services
 
             Event? foundEvent = await _eventRepository.GetEventById(eventId);
             if (foundEvent == null) throw new NotFoundException("Event not found");
+            if (foundEvent.IsFull) throw new BadRequestException("Event is full");
+            if (foundEvent.Participants.Any(p => p.Id == foundUser.Id)) throw new BadRequestException("User already registered in this event");
 
             foundEvent.Participants?.Add(foundUser);
+
+            if (foundEvent.Participants.Count == foundEvent.MaxParticipantsCount) foundEvent.IsFull = true;
+            if (foundEvent.Participants.Count > foundEvent.MaxParticipantsCount) throw new InternalErrorException("Somehow you added more participants than you could");
 
             await _eventRepository.UpdateEvent(foundEvent);
         }
@@ -158,6 +165,8 @@ namespace Services.Services
             if (foundEvent == null) throw new NotFoundException("Event not found");
 
             foundEvent.Participants?.Remove(foundUser);
+
+            if(foundEvent.IsFull) foundEvent.IsFull= false;
 
             await _eventRepository.UpdateEvent(foundEvent);
         }
