@@ -12,13 +12,19 @@ var app = builder.Build();
 app.UseMiddleware<ErrorHandlerMiddleWare>();
 
 using (var scope = app.Services.CreateScope())
+{
     await DbInitializer.SeedUsersAndRolesAsync(scope.ServiceProvider);
+
+    string path = Path.Combine(app.Environment.ContentRootPath, "Uploads");
+    if (!Directory.Exists(path))
+        Directory.CreateDirectory(path);
+}
 
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
-           Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
-    RequestPath = "/Resources"
+           Path.Combine(builder.Environment.ContentRootPath, "Uploads", "EventsImages")),
+    RequestPath = "/Images"
 });
 
 app.UseHttpsRedirection();

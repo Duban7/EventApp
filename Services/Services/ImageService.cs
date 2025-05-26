@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Services.Exeptions;
 using Services.Interfaces;
 using System;
 
@@ -16,7 +18,7 @@ namespace Services.Services
         public async Task<string> SaveImageAsync(IFormFile imageFile)
         {
             if(imageFile == null)
-                throw new ArgumentNullException(nameof(imageFile));
+                throw new BadRequestException("Image wasn't sent");
 
             string path = Path.Combine(rootPath, "Uploads", "EventsImages");
             if(!Directory.Exists(path)) 
@@ -24,7 +26,7 @@ namespace Services.Services
 
             var ext = Path.GetExtension(imageFile.FileName);
             if (!allowedFileExtensions.Contains(ext))
-                throw new ArgumentException($"Only {string.Join(",", allowedFileExtensions)} are allowed.");
+                throw new BadRequestException($"Only {string.Join(",", allowedFileExtensions)} are allowed.");
 
 
             var fileName = $"{Guid.NewGuid().ToString()}{ext}";
@@ -37,7 +39,7 @@ namespace Services.Services
         public void DeleteImage(string imageNameWithExtension)
         {
             if (string.IsNullOrEmpty(imageNameWithExtension))
-                throw new ArgumentNullException(nameof(imageNameWithExtension));
+                throw new BadRequestException("Image id wasn't sent");
 
             var path = Path.Combine(rootPath, "Uploads", "EventsImages", imageNameWithExtension);
             if (!File.Exists(path))
@@ -50,7 +52,7 @@ namespace Services.Services
         {
             string path = Path.Combine(rootPath, "Uploads", "EventsImages", imageNameWithExtension);
             if (!System.IO.File.Exists(path))
-                throw new FileNotFoundException("image not found");
+                throw new BadRequestException("image not found");
 
             var imageFileStream = System.IO.File.OpenRead(path);
             var ext = Path.GetExtension(imageNameWithExtension);

@@ -37,6 +37,32 @@ namespace Services.Mapper
                 .ForMember(dest => dest.EventPlace, opt => opt.MapFrom(src => src.EventPlace))
                 .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate));
 
+            CreateMap<CreateEventDTO, Event>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate))
+                .ForMember(dest => dest.EventPlace, opt => opt.MapFrom(src => src.EventPlace))
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
+                .ForMember(dest => dest.MaxParticipantsCount, opt => opt.MapFrom(src => src.MaxParticipantsCount));
+            
+            CreateMap<UpdateEventDTO, Event>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate))
+                .ForMember(dest => dest.EventPlace, opt => opt.MapFrom(src => src.EventPlace))
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
+                .ForMember(dest => dest.MaxParticipantsCount, opt => opt.MapFrom(src => src.MaxParticipantsCount));
+            
+            CreateMap<Event, EventDTO>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate))
+                .ForMember(dest => dest.EventPlace, opt => opt.MapFrom(src => src.EventPlace))
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
+                .ForMember(dest => dest.MaxParticipantsCount, opt => opt.MapFrom(src => src.MaxParticipantsCount))
+                .ForMember(dest => dest.ImagePath, opt => opt.MapFrom(src => src.ImagePath));
+
         }
     }
 }

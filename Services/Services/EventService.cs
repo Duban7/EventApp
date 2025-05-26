@@ -5,8 +5,10 @@ using Data.Models;
 using Data.Repositories;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using Services.DTOs;
+using Services.Exeptions;
 using Services.Interfaces;
 
 namespace Services.Services
@@ -27,57 +29,82 @@ namespace Services.Services
             _mapper = mapper;
             _imageService = imageService;
         }
-        public async Task<Event> CreateEvent(Event newEvent)
+        public async Task<EventDTO> CreateEvent(CreateEventDTO newEventDTO)
         {
+            Event newEvent = _mapper.Map<Event>(newEventDTO);
+
             _eventValidator.ValidateAndThrow(newEvent);
 
             Event? foundEvent = await _eventRepository.GetEventByName(newEvent.Name!);
-
-            if (foundEvent != null) throw new Exception("Event already exists");
+            if (foundEvent != null) throw new ConflictException("Event already exists");
 
             await _eventRepository.CreateEvent(newEvent);
 
-            Event createdEvent = (await _eventRepository.GetEventByName(newEvent.Name)) ?? throw new Exception("event wasn't created");
+            Event createdEvent = (await _eventRepository.GetEventByName(newEvent.Name)) ?? throw new InternalErrorException("event wasn't created");
 
-            return createdEvent;
+            EventDTO eventDTO = _mapper.Map<EventDTO>(createdEvent);
+
+            return eventDTO;
         }
 
         public async Task DeleteEvent(int eventId)
         {
-            Event? foundEvent = (await _eventRepository.GetEventById(eventId)) ?? throw new Exception("Event not found");
+            Event? foundEvent = (await _eventRepository.GetEventById(eventId)) ?? throw new NotFoundException("Event not found");
 
             await _eventRepository.DeleteEvent(eventId); 
         }
 
-        public async Task<Event> GetEventById(int eventId)=>
-            (await _eventRepository.GetEventById(eventId)) ?? throw new Exception("Event not found");
+        public async Task<EventDTO> GetEventById(int eventId)
+        {
+            Event foundEvent = (await _eventRepository.GetEventById(eventId)) ?? throw new NotFoundException("Event not found");
 
+            EventDTO eventDTO = _mapper.Map<EventDTO>(foundEvent);
 
-        public async Task<Event> GetEventByName(string name) =>
-            (await _eventRepository.GetEventByName(name)) ?? throw new Exception("Event not found");
+            return eventDTO;
+        }
 
-        public async Task<PaginatedList<Event>> GetEventsFiltered(EventFilterDTO filterDTO, int pageIndex, int PageSize)
+        public async Task<EventDTO> GetEventByName(string name)
+        {
+            Event foundEvent = (await _eventRepository.GetEventByName(name)) ?? throw new NotFoundException("Event not found");
+
+            EventDTO eventDTO = _mapper.Map<EventDTO>(foundEvent);
+
+            return eventDTO;
+        }
+           
+
+        public async Task<PaginatedList<EventDTO>> GetEventsFiltered(EventFilterDTO filterDTO, int pageIndex, int pageSize)
         {
             Event filter = _mapper.Map<Event>(filterDTO);
 
-            var res = await _eventRepository.GetEventsFiltered(filter, pageIndex, PageSize);
-            if (res == null) throw new Exception("Events not found");
+            var res = await _eventRepository.GetEventsFiltered(filter, pageIndex, pageSize);
+            if (res == null) throw new NotFoundException("Events not found");
 
-            return res;
+            var dtos = res.items?.Select(_mapper.Map<EventDTO>).ToList();
+
+            return new PaginatedList<EventDTO>(dtos, pageIndex, res.TotalPages);
         }
 
-        public async Task<PaginatedList<Event>> GetEvents(int pageIndex, int PageSize) =>
-            (await _eventRepository.GetEvents(pageIndex, PageSize)) ?? throw new Exception("Event not found");
-
-        public async Task<Event> UpdateEvent(Event updatedEvent)
+        public async Task<PaginatedList<EventDTO>> GetEvents(int pageIndex, int PageSize)
         {
-            _eventValidator.ValidateAndThrow(updatedEvent);
+            var res = (await _eventRepository.GetEvents(pageIndex, PageSize)) ?? throw new NotFoundException("Event not found");
 
-            if (updatedEvent.Id == null) throw new Exception("Event id wan't sent");
+            if (res == null) throw new NotFoundException("Events not found");
+
+            var dtos = res.items?.Select(_mapper.Map<EventDTO>).ToList();
+
+            return new PaginatedList<EventDTO>(dtos, pageIndex, res.TotalPages);
+        }
+           
+        public async Task<EventDTO> UpdateEvent(UpdateEventDTO updatedEventDTO)
+        {
+            Event updatedEvent = _mapper.Map<Event>(updatedEventDTO);
+
+            _eventValidator.ValidateAndThrow(updatedEvent);
+            if (updatedEvent.Id == null) throw new BadRequestException("Event id wan't sent");
 
             Event? foundEvent = await _eventRepository.GetEventById(updatedEvent.Id);
-
-            if (foundEvent == null) throw new Exception("Event not found");
+            if (foundEvent == null) throw new NotFoundException("Event not found");
 
             if (updatedEvent.Description != null)
                 foundEvent.Description = updatedEvent.Description;
@@ -90,15 +117,17 @@ namespace Services.Services
             if (updatedEvent.MaxParticipantsCount != null)
                 foundEvent.MaxParticipantsCount = updatedEvent.MaxParticipantsCount;
 
-            Event? resEvent = (await _eventRepository.UpdateEvent(foundEvent)) ?? throw new Exception("event wasn't created"); 
+            Event? resEvent = (await _eventRepository.UpdateEvent(foundEvent)) ?? throw new InternalErrorException("event wasn't updated");
 
-            return resEvent;
+            EventDTO resEventDTO = _mapper.Map<EventDTO>(resEvent);
+
+            return resEventDTO;
         }
         public async Task RemoveImageFromEvent(int eventId)
         {
             Event? foundEvent = await _eventRepository.GetEventById(eventId);
-            if (foundEvent == null) throw new Exception("Event not found");
-            if (foundEvent.ImagePath == null) throw new Exception("Event doesn't have image");
+            if (foundEvent == null) throw new NotFoundException("Event not found");
+            if (foundEvent.ImagePath == null) throw new BadRequestException("Event doesn't have image");
 
             _imageService.DeleteImage(foundEvent.ImagePath);
 
@@ -109,7 +138,7 @@ namespace Services.Services
         public async Task AddImageToEvent(int eventId, IFormFile imageFile)
         {
             Event? foundEvent = await _eventRepository.GetEventById(eventId);
-            if (foundEvent == null) throw new Exception("Event not found");
+            if (foundEvent == null) throw new NotFoundException("Event not found");
 
             foundEvent.ImagePath = await _imageService.SaveImageAsync(imageFile);
 
@@ -120,14 +149,14 @@ namespace Services.Services
         {
 
             Event? foundEvent = await _eventRepository.GetEventById(eventId);
-            if (foundEvent == null) throw new Exception("Event not found");
-            if (foundEvent.ImagePath == null) throw new Exception("Event doesn't have image");
+            if (foundEvent == null) throw new NotFoundException("Event not found");
+            if (foundEvent.ImagePath == null) throw new BadRequestException("Event doesn't have image");
 
             string ext;
             FileStream imageFile;
          
             (imageFile,ext) = _imageService.GetImageStream(foundEvent.ImagePath);
-            if (ext == null || imageFile == null) throw new Exception("Couldn't open filestream or get file extention");
+            if (ext == null || imageFile == null) throw new InternalErrorException("Couldn't open filestream or get file extention");
             
             ext = $"image/{ext.TrimStart('.').ToLower()}";
             

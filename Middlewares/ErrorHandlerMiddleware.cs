@@ -1,4 +1,5 @@
-﻿using System.Net.Mime;
+﻿using Services.Exeptions;
+using System.Net.Mime;
 
 namespace EventApp.Middlewares
 {
@@ -25,7 +26,9 @@ namespace EventApp.Middlewares
 
                 context.Response.StatusCode = error switch
                 {
-                    Exception => StatusCodes.Status400BadRequest,
+                    NotFoundException => StatusCodes.Status404NotFound,
+                    BadRequestException => StatusCodes.Status400BadRequest,
+                    ConflictException => StatusCodes.Status409Conflict,
                     _ => StatusCodes.Status500InternalServerError,
                 };
 

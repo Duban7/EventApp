@@ -9,7 +9,7 @@ using Services.Interfaces;
 namespace EventApp.Controllers
 {
     [ApiController]
-    [Route("EventApi")]
+    [Route("EventApi/event")]
     public class EventContorller : ControllerBase
     {
         private readonly IEventService _eventService;
@@ -22,8 +22,8 @@ namespace EventApp.Controllers
         }
 
         [HttpGet]
-        [Route("/event/get-all/{pageIndex}/{pageSize}")]
-        public async Task<ActionResult<PaginatedList<Event>>> GetEvents(int pageIndex, int pageSize)
+        [Route("get-all/{pageIndex}/{pageSize}")]
+        public async Task<ActionResult<PaginatedList<EventDTO>>> GetEvents(int pageIndex, int pageSize)
         {
             var res = await _eventService.GetEvents(pageIndex, pageSize);
 
@@ -31,8 +31,8 @@ namespace EventApp.Controllers
         }
 
         [HttpGet]
-        [Route("/event/get-filtered")]
-        public async Task<ActionResult<PaginatedList<Event>>> GetEvents([FromQuery]EventFilterDTO filterDTO, int pageIndex, int pageSize)
+        [Route("get-filtered")]
+        public async Task<ActionResult<PaginatedList<EventDTO>>> GetEvents([FromQuery]EventFilterDTO filterDTO, int pageIndex, int pageSize)
         {
             var res = await _eventService.GetEventsFiltered(filterDTO,pageIndex, pageSize);
 
@@ -40,46 +40,46 @@ namespace EventApp.Controllers
         }
 
         [HttpGet]
-        [Route("/event/{eventId}")]
-        public async Task<ActionResult<Event>> GetEventById(int eventId)
+        [Route("{eventId}")]
+        public async Task<ActionResult<EventDTO>> GetEventById(int eventId)
         {
-            Event res = await _eventService.GetEventById(eventId);
+            EventDTO res = await _eventService.GetEventById(eventId);
 
             return Ok(res);
         }
 
         [HttpGet]
-        [Route("/event/name-{eventName}")]
-        public async Task<ActionResult<Event>> GetEventByName(string eventName)
+        [Route("name-{eventName}")]
+        public async Task<ActionResult<EventDTO>> GetEventByName(string eventName)
         {
-            Event res = await _eventService.GetEventByName(eventName);
+            EventDTO res = await _eventService.GetEventByName(eventName);
 
             return Ok(res);
         }
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
-        [Route("/event/add")]
-        public async Task<ActionResult<Event>> AddEvent(Event newEvent)
+        [Route("add")]
+        public async Task<ActionResult<EventDTO>> AddEvent([FromForm] CreateEventDTO newEventDTO)
         {
-            Event res = await _eventService.CreateEvent(newEvent);
+            EventDTO res = await _eventService.CreateEvent(newEventDTO);
 
             return Ok(res);
         }
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
-        [Route("/event/update")]
-        public async Task<ActionResult<Event>> UpdateEvent(Event updatedEvent)
+        [Route("update")]
+        public async Task<ActionResult<EventDTO>> UpdateEvent([FromForm] UpdateEventDTO updatedEventDTO)
         {
-            Event res = await _eventService.UpdateEvent(updatedEvent);
+            EventDTO res = await _eventService.UpdateEvent(updatedEventDTO);
 
             return Ok(res);
         }
 
         [HttpDelete]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
-        [Route("/event/{eventId}")]
+        [Route("{eventId}")]
         public async Task<ActionResult> DeleteEvent(int eventId)
         {
             await _eventService.DeleteEvent(eventId);
@@ -89,7 +89,7 @@ namespace EventApp.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
-        [Route("event/{eventId}/image")]
+        [Route("{eventId}/image")]
         public async Task<ActionResult> AddImageToEvent([FromForm] ImageDTO imageDTO, int eventId)
         {
             await _eventService.AddImageToEvent(eventId, imageDTO.imageFile);
@@ -99,7 +99,7 @@ namespace EventApp.Controllers
 
         [HttpDelete]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
-        [Route("event/{eventId}/image")]
+        [Route("{eventId}/image")]
         public async Task<ActionResult> RemoveImageFromEvent(int eventId)
         {
             await _eventService.RemoveImageFromEvent(eventId);
@@ -108,7 +108,7 @@ namespace EventApp.Controllers
         }
 
         [HttpGet]
-        [Route("event/{eventId}/image")]
+        [Route("{eventId}/image")]
         public async Task<ActionResult> GetEventImage(int eventId)
         {
             string cType;

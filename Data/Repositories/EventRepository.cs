@@ -23,12 +23,33 @@ namespace Data.Repositories
         {
           await _context.Events.Where(e => e.Id == eventId).ExecuteDeleteAsync();
         }
-        public Task<Event?> GetEventById(int eventId)=>
-            _context.Events.Where(e=>e.Id==eventId).Include(e=>e.Participants).FirstOrDefaultAsync();
-        
+        public Task<Event?> GetEventById(int eventId) =>
+            _context.Events.Where(e => e.Id == eventId).Select(e => new Event()
+            {
+                Id = e.Id,
+                Category = e.Category,
+                Description = e.Description,
+                EventPlace = e.EventPlace,
+                MaxParticipantsCount = e.MaxParticipantsCount,
+                ImagePath = e.ImagePath,
+                Name = e.Name,
+                StartDate = e.StartDate
+            }).FirstOrDefaultAsync();
+
+
 
         public Task<Event?> GetEventByName(string eventName) =>
-            _context.Events.Where(e => e.Name == eventName).Include(e => e.Participants).FirstOrDefaultAsync();
+            _context.Events.Where(e => e.Name == eventName).Select(e => new Event()
+            {
+                Id = e.Id,
+                Category = e.Category,
+                Description = e.Description,
+                EventPlace = e.EventPlace,
+                MaxParticipantsCount = e.MaxParticipantsCount,
+                ImagePath = e.ImagePath,
+                Name = e.Name,
+                StartDate = e.StartDate
+            }).FirstOrDefaultAsync();
 
         public async Task<PaginatedList<Event>> GetEvents(int pageIndex, int pageSize)
         {
@@ -36,7 +57,17 @@ namespace Data.Repositories
             .OrderBy(e => e.StartDate)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
-            .Include(e => e.Participants)
+            .Select(e=> new Event()
+            {
+                Id = e.Id,
+                Category = e.Category,
+                Description = e.Description,
+                EventPlace = e.EventPlace,
+                MaxParticipantsCount = e.MaxParticipantsCount,
+                ImagePath = e.ImagePath,
+                Name = e.Name,
+                StartDate = e.StartDate
+            })
             .ToListAsync();
 
             var count = await _context.Events.CountAsync();
@@ -62,7 +93,17 @@ namespace Data.Repositories
                 .OrderBy(e => e.StartDate)
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
-                .Include(e => e.Participants)
+                .Select(e => new Event()
+                {
+                    Id = e.Id,
+                    Category = e.Category,
+                    Description = e.Description,
+                    EventPlace = e.EventPlace,
+                    MaxParticipantsCount = e.MaxParticipantsCount,
+                    ImagePath = e.ImagePath,
+                    Name = e.Name,
+                    StartDate = e.StartDate
+                })
                 .ToListAsync();
 
             var count = await _context.Events.CountAsync();
