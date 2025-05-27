@@ -73,9 +73,6 @@ namespace Data.Migrations
                     b.Property<string>("ParticipantsId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ParticipantId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("RegistrationDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")

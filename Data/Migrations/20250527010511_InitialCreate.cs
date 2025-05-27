@@ -187,7 +187,6 @@ namespace Data.Migrations
                 {
                     EventId = table.Column<int>(type: "int", nullable: false),
                     ParticipantsId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ParticipantId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>

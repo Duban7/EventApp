@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(EventAppDbContext))]
-    [Migration("20250526104727_InitialCreate")]
+    [Migration("20250527010511_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -75,9 +75,6 @@ namespace Data.Migrations
 
                     b.Property<string>("ParticipantsId")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ParticipantId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("RegistrationDate")
                         .ValueGeneratedOnAdd()
