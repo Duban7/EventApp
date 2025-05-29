@@ -7,7 +7,7 @@ namespace Data.Models
         public List<T>? items { get;}
         public int? pageIndex { get;}
         public int? TotalPages { get; }
-        public bool HasPreviosPage => pageIndex > 1;
+        public bool HasPreviousPage => pageIndex > 1;
         public bool HasNextPage => pageIndex < TotalPages;
 
         public PaginatedList(List<T>? items, int? pageIndex, int? totalPages)

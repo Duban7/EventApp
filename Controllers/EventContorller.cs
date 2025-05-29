@@ -31,7 +31,7 @@ namespace EventApp.Controllers
         }
 
         [HttpGet]
-        [Route("get-filtered")]
+        [Route("get-filtered/{pageIndex}/{pageSize}")]
         public async Task<ActionResult<PaginatedList<EventDTO>>> GetEvents([FromQuery]EventFilterDTO filterDTO, int pageIndex, int pageSize)
         {
             var res = await _eventService.GetEventsFiltered(filterDTO,pageIndex, pageSize);

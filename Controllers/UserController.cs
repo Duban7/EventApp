@@ -60,6 +60,9 @@ namespace EventApp.Controllers
 
             res.User = foundUser;
             res.Token = _tokenService.GenerateAccesToken(claims);
+            res.Roles = claims.Where(i => i.Type == ClaimTypes.Role)
+                              .Select(c=>c.Value)
+                              .ToArray();
 
             return Ok(res);
         }

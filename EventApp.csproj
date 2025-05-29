@@ -1,28 +1,37 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+	<SpaRoot>EventApp.Client\</SpaRoot>
+    <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
+    <SpaProxyServerUrl>https://localhost:62042</SpaProxyServerUrl>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Data\**" />
+    <Compile Remove="EventApp.Client\**" />
     <Compile Remove="Services\**" />
     <Compile Remove="Tests\**" />
     <Content Remove="Data\**" />
+    <Content Remove="EventApp.Client\**" />
     <Content Remove="Services\**" />
     <Content Remove="Tests\**" />
     <EmbeddedResource Remove="Data\**" />
+    <EmbeddedResource Remove="EventApp.Client\**" />
     <EmbeddedResource Remove="Services\**" />
     <EmbeddedResource Remove="Tests\**" />
     <None Remove="Data\**" />
+    <None Remove="EventApp.Client\**" />
     <None Remove="Services\**" />
     <None Remove="Tests\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.16" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -32,7 +41,8 @@
 
   <ItemGroup>
     <ProjectReference Include="Data\Data.csproj" />
+    <ProjectReference Include="EventApp.client\eventapp.client.esproj" />
     <ProjectReference Include="Services\Services.csproj" />
   </ItemGroup>
-
+	
 </Project>

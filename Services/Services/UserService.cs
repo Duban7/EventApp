@@ -75,6 +75,7 @@ namespace Services.Services
 
             userTokenDTO.User = userDTO;
             userTokenDTO.Token = _tokenService.GenerateAccesToken(claims);
+            userTokenDTO.Roles = ["User"];
 
             return userTokenDTO;
         }

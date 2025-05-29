@@ -1,0 +1,14 @@
+ <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <input formControlName="name" placeholder="Имя">
+      <input formControlName="surname" placeholder="Фамилия">
+      
+      <input formControlName="email" type="email" placeholder="Email">
+      <input formControlName="password" type="password" placeholder="Пароль">
+      
+      <input formControlName="dateOfBirth" type="date" 
+             [max]="maxDate | date:'yyyy-MM-dd'">
+      
+      <button type="submit" [disabled]="registerForm.invalid || isLoading">
+        Зарегистрироваться
+      </button>
+    </form>

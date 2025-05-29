@@ -56,12 +56,14 @@ namespace Data.Repositories
 
             var list = query.ToList();
 
+            if (filter.Name != null)
+                query = query.Where(x => x.Name.Contains(filter.Name));
             if (filter.Category != null)
-                query = query.Where(x => x.Category == filter.Category);
+                query = query.Where(x => x.Category.Contains(filter.Category));
             if (filter.StartDate.HasValue)
                 query = query.Where(x => x.StartDate!.Value.Day == filter.StartDate.Value.Day);
             if (filter.EventPlace != null)
-                query = query.Where(x => x.EventPlace == filter.EventPlace);
+                query = query.Where(x => x.EventPlace.Contains(filter.EventPlace));
 
             List<Event>? events = await query
                 .OrderBy(e => e.StartDate)
@@ -69,7 +71,7 @@ namespace Data.Repositories
                 .Take(pageSize)
                 .ToListAsync();
 
-            var count = await _context.Events.CountAsync();
+            var count = await query.CountAsync();
             var totalPages = (int)Math.Ceiling(count / (double)pageSize);
 
             return new PaginatedList<Event>(events, pageIndex, totalPages);

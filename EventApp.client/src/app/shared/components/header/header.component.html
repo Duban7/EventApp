@@ -1,0 +1,20 @@
+<header class="header">
+  <div class="logo" (click)="navigateHome()">Event app</div>
+  
+  <nav class="nav">
+    <button 
+      class="nav-button"
+      (click)="navigateToProfile()"
+    >
+      Профиль
+    </button>
+
+    <button 
+      *ngIf="authService.isAdmin"
+      class="nav-button admin-button"
+      (click)="navigateToAdmin()"
+    >
+      Админ
+    </button>
+  </nav>
+</header>

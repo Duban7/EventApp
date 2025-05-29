@@ -1,0 +1,47 @@
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+  <div class="form-group">
+    <input 
+      formControlName="email" 
+      type="email" 
+      placeholder="Email"
+      class="form-input"
+      [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+    <div 
+      *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" 
+      class="validation-error">
+      Введите корректный email
+    </div>
+  </div>
+
+  <div class="form-group">
+    <input 
+      formControlName="password" 
+      type="password" 
+      placeholder="Пароль"
+      class="form-input"
+      [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+  </div>
+
+  <div class="form-actions">
+    <button 
+      type="submit" 
+      [disabled]="loginForm.invalid || isLoading"
+      class="primary-button">
+      <span *ngIf="isLoading" class="button-loader">
+        <i class="fas fa-spinner fa-spin"></i> Вход...
+      </span>
+      <span *ngIf="!isLoading">Войти</span>
+    </button>
+
+    <button 
+      type="button" 
+      (click)="navigateRegister()"
+      class="secondary-button">
+      Зарегистрироваться
+    </button>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+  </div>
+</form>

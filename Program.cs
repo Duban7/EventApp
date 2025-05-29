@@ -1,6 +1,7 @@
 using EventApp.DI;
 using EventApp.Helpers;
 using EventApp.Middlewares;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,17 +28,20 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/Images"
 });
 
+app.UseRouting();
+app.UseCors("AllowWithCredentials");
+
 app.UseHttpsRedirection();
-app.UseCors();
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapFallbackToFile("/index.html");
 
 app.Run();
