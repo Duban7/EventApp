@@ -16,7 +16,7 @@ using (var scope = app.Services.CreateScope())
 {
     await DbInitializer.SeedUsersAndRolesAsync(scope.ServiceProvider);
 
-    string path = Path.Combine(app.Environment.ContentRootPath, "Uploads");
+    string path = Path.Combine(app.Environment.ContentRootPath, "Uploads", "EventsImages");
     if (!Directory.Exists(path))
         Directory.CreateDirectory(path);
 }

@@ -6,6 +6,8 @@ import { ProfileComponent } from './features/user/user.profile.component';
 import { AuthGuard } from './core/guards/AuthGuard';
 import { AdminGuard } from './core/guards/AdminGuard';
 import { EventDetailsComponent } from './features/events/event-details/event-details.component';
+import { EventEditComponent } from './features/events/event-edit/event-edit.component';
+import { EventListComponent } from './features/events/event-list/event-list.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -17,7 +19,20 @@ const routes: Routes = [
   },
   {
     path: 'admin',
-    component: ProfileComponent,
+    children: [
+      {
+        path: '',
+        component: EventListComponent
+      },
+      {
+        path: 'event/new',
+        component: EventEditComponent
+      },
+      {
+        path: 'event/edit/:id',
+        component: EventEditComponent
+      }
+    ],
     canActivate: [AuthGuard, AdminGuard]
   },
   {

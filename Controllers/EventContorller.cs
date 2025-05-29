@@ -67,7 +67,7 @@ namespace EventApp.Controllers
             return Ok(res);
         }
 
-        [HttpPost]
+        [HttpPut]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
         [Route("update")]
         public async Task<ActionResult<EventDTO>> UpdateEvent([FromForm] UpdateEventDTO updatedEventDTO)
@@ -82,6 +82,7 @@ namespace EventApp.Controllers
         [Route("{eventId}")]
         public async Task<ActionResult> DeleteEvent(int eventId)
         {
+            await _eventService.RemoveImageFromEvent(eventId);
             await _eventService.DeleteEvent(eventId);
 
             return Ok();

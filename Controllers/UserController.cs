@@ -32,7 +32,7 @@ namespace EventApp.Controllers
             return Ok(newUser);
         }
 
-        [HttpPost]
+        [HttpPut]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "UserPolicy")]
         [Route("update")]
         public async Task<ActionResult<UserDTO>> UpdateUser([FromBody] UserDTO userDTO)

@@ -4,6 +4,7 @@ import { EventService } from '../../../core/services/event.service';
 import { Page } from '../../../core/models/page';
 import { Event as _Event } from '../../../core/models/event';
 import { FormBuilder, FormGroup, FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-event-list',
@@ -20,9 +21,13 @@ export class EventListComponent implements OnInit {
   showFilters = false;
   isFiltered = false;
   filterForm: FormGroup;
+  isAdminMode = false;
+  showDeleteModal = false;
+  eventToDelete: number | null = null;
 
   constructor(private eventService: EventService,
-              private fb: FormBuilder
+              private fb: FormBuilder,
+              private router: Router,
   ) {
     this.filterForm = this.fb.group({
       name: [''],
@@ -33,7 +38,37 @@ export class EventListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.checkAdminMode();
     this.loadEvents();
+  }
+  
+  checkAdminMode(): void {
+    this.isAdminMode = this.router.url.toString().includes('admin');
+  }
+
+  confirmDelete(eventId: number): void {
+    this.eventToDelete = eventId;
+    this.showDeleteModal = true;
+  }
+
+     cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.eventToDelete = null;
+  }
+
+  deleteEvent(): void {
+    if (this.eventToDelete) {
+      this.eventService.deleteEvent(this.eventToDelete).subscribe({
+        next: () => {
+          this.showDeleteModal = false;
+          this.loadEvents();
+        },
+        error: (err) => {
+          console.error('Ошибка удаления:', err);
+          this.showDeleteModal = false;
+        }
+      });
+    }
   }
 
   toggleFilters(): void {

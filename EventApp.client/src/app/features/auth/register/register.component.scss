@@ -1,0 +1,120 @@
+.auth-form {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-title {
+  text-align: center;
+  color: #1976d2;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  flex: 1;
+  padding-right: 2rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: all 0.3s;
+
+  &:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+  }
+
+  &.invalid {
+    border-color: #d32f2f;
+  }
+}
+
+.date-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.date-input {
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.validation-error {
+  color: #d32f2f;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.primary-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 0.5rem;
+
+  &:hover:not(:disabled) {
+    background-color: #1565c0;
+  }
+
+  &:disabled {
+    background-color: #b0bec5;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+}
+
+.button-loader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.error-message {
+  margin-top: 1.5rem;
+  padding: 0.75rem;
+  background-color: #ffebee;
+  color: #d32f2f;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+
+  i {
+    font-size: 1rem;
+  }
+}

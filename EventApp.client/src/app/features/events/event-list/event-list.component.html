@@ -50,6 +50,12 @@
     </button>
  </form>
   
+  <div *ngIf="isAdminMode" class="admin-controls">
+    <button class="add-button" [routerLink]="['event/new']">
+      Добавить событие
+    </button>
+  </div>
+
   <div *ngIf="isLoading" class="loading-spinner">
     <i class="fas fa-spinner fa-spin"></i> Загрузка...
   </div>
@@ -63,13 +69,25 @@
       <div *ngFor="let event of eventsPage.items" class="event-card">
         
       <h3>{{ event.name }}</h3>
-      <p>{{ event.description | truncate:100 }}</p>
+      <p *ngIf="event.isFull" style="color: red;"> Мест нет</p>
+      <p *ngIf="!event.isFull">{{ event.description | truncate:100 }}</p>
       <div class="event-meta">
         <span><i class="fas fa-calendar-alt"></i> {{ event.startDate | date:'mediumDate' }}</span>
         <span><i class="fas fa-map-marker-alt"></i> Мето проведения: {{ event.eventPlace }}</span>
+        
       </div>
-      <button class="btn-details" [routerLink]="['/event', event.id]">Подробнее</button>
-  
+      <div class="event-actions">
+        <button class="btn-details" [routerLink]="['/event', event.id]">Подробнее</button>
+        <div *ngIf="isAdminMode" class="admin-actions">
+          <button class="edit-button" [routerLink]="['event/edit', event.id]">
+            Изменить
+          </button>
+          <button (click)="confirmDelete(event.id)" class="delete-button">
+            Удалить
+          </button>
+        </div>
+      </div>
+     
       </div>
     </div>
 
@@ -98,6 +116,18 @@
         &raquo;
       </button>
     </div>
+
+      <div *ngIf="showDeleteModal" class="modal-overlay">
+        <div class="modal-content">
+          <h3>Подтверждение удаления</h3>
+          <p>Вы уверены, что хотите удалить это событие?</p>
+          <div class="modal-actions">
+            <button (click)="cancelDelete()" class="cancel-button">Отмена</button>
+            <button (click)="deleteEvent()" class="confirm-button">Удалить</button>
+          </div>
+        </div>
+      </div>
+
   </div>
 </div>
 

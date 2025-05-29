@@ -35,14 +35,11 @@ export class EventService{
         const url = this.apiUrl+'/get-filtered/'+pageNumber.toString()+'/'+pageSize.toString();
         let params = new HttpParams();
         if(filter){
-            console.log(filter);
             if(filter.name)  params = params.set('Name', filter.name)
-                console.log(typeof(filter.startDate));
             if(filter.category) params = params.set('Category', filter.category)
             if(filter.startDate) params = params.set('StartDate', filter.startDate)
             if(filter.eventPlace) params = params.set('EventPlace', filter.eventPlace)
         }
-    console.log(params);
         return this.http.get<Page<Event>>(url, {params});
     }
 
@@ -54,11 +51,49 @@ export class EventService{
         return this.http.get<Participant[]>(this.userApiUrl+'/get-event-participants/'+eventId.toString());
     }
 
+    createEvent(eventData: Partial<Event>) : Observable<Event>{
+        const formData = new FormData();
+        formData.append('name', eventData.name!.toString());
+        formData.append('description', eventData.description!);
+        formData.append('startDate', eventData.startDate!.toISOString());
+        formData.append('eventPlace', eventData.eventPlace!);
+        formData.append('category', eventData.category!);
+        formData.append('maxParticipantsCount', eventData.maxParticipantsCount!.toString());
+
+        return this.http.post<Event>(this.apiUrl+'/add', formData);
+    }
+
+    updateEvent( eventData: Partial<Event>) : Observable<Event>{
+        const formData = new FormData();
+        formData.append('id', eventData.id!.toString());
+        formData.append('description', eventData.description!);
+        formData.append('startDate', eventData.startDate!.toISOString());
+        formData.append('eventPlace', eventData.eventPlace!);
+        formData.append('category', eventData.category!);
+        formData.append('maxParticipantsCount', eventData.maxParticipantsCount!.toString());
+
+        return this.http.put<Event>(this.apiUrl+'/update', formData);
+    }
+
     registerOnEvent(eventId: number): Observable<any>{
         return this.http.post(this.userApiUrl+'/reg-event/'+eventId.toString(),{});
     }
 
     unregisterFromEvent(eventId: number): Observable<any>{
         return this.http.post(this.userApiUrl+'/unreg-event/'+eventId.toString(),{});
+    }
+
+    deleteEvent(eventId: number) : Observable<any>{
+        return this.http.delete(this.apiUrl+'/'+eventId.toString());
+    }
+
+    uploadEventImage(eventId: number, imageFile: File) : Observable<any> {
+        const formData = new FormData();
+        formData.append('imageFile', imageFile);
+        return this.http.post(this.apiUrl+'/'+eventId+'/image', formData);
+    }
+
+    deleteEventImage(eventId: number): Observable<any> {
+        return this.http.delete(`${this.apiUrl}/${eventId}/image`);
     }
 }
