@@ -7,7 +7,7 @@ namespace Services.Interfaces
     public interface IUserService
     {
         public Task<UserTokenDTO> CreateUser(SignUpUserDTO newUserDTO);
-        public Task<UserDTO?> UpdateUser(UserDTO updatedUserDTO);
+        public Task<UserDTO> UpdateUser(UpdateUserDTO updatedUserDTO);
         public Task DeleteUser(string userId);
         public Task<UserDTO> LogIn(string email, string password);
         public Task<UserDTO?> GetUserById(string userId);

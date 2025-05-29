@@ -8,7 +8,7 @@ namespace Services.Mapper
     {
         public AutoMapperProfile()
         {
-            CreateMap<UserDTO, User>()
+            CreateMap<UpdateUserDTO, User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.RefreshToken, opt => opt.Ignore())
                 .ForMember(dest => dest.RefreshExpires, opt => opt.Ignore())

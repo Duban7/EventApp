@@ -13,5 +13,6 @@ namespace Data.Interfaces
         public Task<PaginatedList<Event>> GetEvents(int pageIndex, int pageSize);
         public Task<PaginatedList<Event>> GetEventsFiltered(Event filter,int pageIndex, int pageSize);
         public Task<int> GetEventParticipantsCount(int eventId);
+        public Task<List<Event>> GetUserEvents(string userId);
     }
 }

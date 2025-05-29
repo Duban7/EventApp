@@ -96,4 +96,8 @@ export class EventService{
     deleteEventImage(eventId: number): Observable<any> {
         return this.http.delete(`${this.apiUrl}/${eventId}/image`);
     }
+
+    getUserEvents(userId: string): Observable<Event[]> {
+        return this.http.get<Event[]>(`${this.apiUrl}/get-user-events/${userId}`);
+    }
 }

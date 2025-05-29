@@ -44,7 +44,7 @@ namespace EventApp.DI
             {
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireDigit = true;
-                options.Password.RequireLowercase = true;
+                options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
             })
                 .AddEntityFrameworkStores<EventAppDbContext>()

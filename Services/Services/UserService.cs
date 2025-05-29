@@ -51,7 +51,7 @@ namespace Services.Services
             newUser.UserName = newUser.Email;
 
             var res = await _userManager.CreateAsync(newUser, password);
-            if (!res.Succeeded) throw new InternalErrorException("Couldn't create User");
+            if (!res.Succeeded) throw new InternalErrorException("Couldn't create User" + res.Errors.ToString());
 
             foundUser = await _userManager.FindByEmailAsync(newUser.Email!) ?? throw new NotFoundException("User not found");
 
@@ -172,9 +172,10 @@ namespace Services.Services
             await _eventRepository.UpdateEvent(foundEvent);
         }
 
-        public async Task<UserDTO?> UpdateUser(UserDTO updatedUserDTO)
+        public async Task<UserDTO> UpdateUser(UpdateUserDTO updatedUserDTO)
         {
             User updatedUser = _mapper.Map<User>(updatedUserDTO);
+
             _userValidator.ValidateAndThrow(updatedUser);
 
             User? foundUser = await _userManager.FindByEmailAsync(updatedUser.Email!);

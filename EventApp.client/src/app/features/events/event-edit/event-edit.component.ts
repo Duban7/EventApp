@@ -29,12 +29,12 @@ export class EventEditComponent implements OnInit {
     private eventService: EventService
   ) {
     this.eventForm = this.fb.group({
-      name: ['', [Validators.required, Validators.maxLength(100)]],
-      description: ['', [Validators.maxLength(500)]],
+      name: ['', [Validators.required,Validators.minLength(4), Validators.maxLength(40)]],
+      description: ['', [Validators.maxLength(2000)]],
       startDate: [this.tomorrow, [Validators.required]],
       eventPlace: ['', [Validators.required, Validators.maxLength(100)]],
       category: ['', [Validators.required, Validators.maxLength(50)]],
-      maxParticipantsCount: ['', [Validators.required, Validators.min(4)]]
+      maxParticipantsCount: ['', [Validators.required, Validators.min(4), Validators.max(300)]]
     });
   }
 

@@ -119,5 +119,15 @@ namespace EventApp.Controllers
 
             return File(imageFile, cType);
         }
+
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "UserPolicy")]
+        [Route("get-user-events/{userId}")]
+        public async Task<ActionResult<List<EventDTO>>> GetUserEvents(string userId)
+        {
+            var res = await _eventService.GetUserEvents(userId);
+
+            return Ok(res);
+        }
     }
 }

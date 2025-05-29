@@ -20,6 +20,7 @@ namespace Services.Interfaces
         public Task<PaginatedList<EventDTO>> GetEventsFiltered(EventFilterDTO filter, int pageIndex, int PageSize);
         public Task AddImageToEvent(int eventId, IFormFile imageFile);
         public Task RemoveImageFromEvent(int eventId);
-        public Task<(FileStream, string)> GetImage(int eventId); 
+        public Task<(FileStream, string)> GetImage(int eventId);
+        public Task<List<EventDTO>> GetUserEvents(string userId);
     }
 }

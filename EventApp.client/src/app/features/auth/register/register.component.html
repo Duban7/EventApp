@@ -55,7 +55,7 @@
       formControlName="dateOfBirth" 
       type="date" 
       class="form-input date-input"
-      [max]="maxDate | date:'yyyy-MM-dd'"
+      [max]="yesterday | date:'yyyy-MM-dd'"
       [class.invalid]="registerForm.get('dateOfBirth')?.invalid && registerForm.get('dateOfBirth')?.touched">
   </div>
 

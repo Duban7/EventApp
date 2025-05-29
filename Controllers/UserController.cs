@@ -35,9 +35,11 @@ namespace EventApp.Controllers
         [HttpPut]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "UserPolicy")]
         [Route("update")]
-        public async Task<ActionResult<UserDTO>> UpdateUser([FromBody] UserDTO userDTO)
+        public async Task<ActionResult<UserDTO>> UpdateUser([FromForm] UpdateUserDTO userDTO)
         {
-            return Ok(await _userService.UpdateUser(userDTO));
+            UserDTO updatedUser = await _userService.UpdateUser(userDTO);
+
+            return Ok(updatedUser);
         }
 
         [HttpDelete]

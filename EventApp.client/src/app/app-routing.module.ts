@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
-import { ProfileComponent } from './features/user/user.profile.component';
+import { ProfileComponent } from './features/user/user-profile.component';
 import { AuthGuard } from './core/guards/AuthGuard';
 import { AdminGuard } from './core/guards/AdminGuard';
 import { EventDetailsComponent } from './features/events/event-details/event-details.component';

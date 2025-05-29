@@ -15,6 +15,8 @@ export class RegisterComponent {
   isLoading = false;
   maxDate = new Date();
   errorMessage = '';
+  yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0];
+
 
   constructor(
     private fb: FormBuilder,
@@ -48,7 +50,10 @@ export class RegisterComponent {
         this.router.navigateByUrl(returnUrl);
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Ошибка регистрации';
+        let msg;
+        if(err.status == 409) msg = "Пользователь с таким email уже существует" ;
+        if(err.status == 400) msg = "Пользователь не прошел валидацию" ;
+        this.errorMessage = err.error?.message || 'Ошибка регистрации: '+msg;
         this.isLoading = false;
       }
     });

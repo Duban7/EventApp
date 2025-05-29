@@ -96,6 +96,11 @@ export class AuthService{
         this.router.navigate(['/login']);
     }
 
+    updateCurrentUser(user: User): void {
+        this.currentUserSubject.next(user);
+        localStorage.setItem('currentUser', JSON.stringify(user));
+    }
+
     private storeAuthData(authResponse: AuthResponse): void {
         localStorage.setItem('currentUser', JSON.stringify(authResponse.user));
         localStorage.setItem('accessToken', authResponse.token);

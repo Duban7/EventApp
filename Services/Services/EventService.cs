@@ -171,5 +171,17 @@ namespace Services.Services
             
             return (imageFile,ext);
         }
+
+
+        public async Task<List<EventDTO>> GetUserEvents(string userId)
+        {
+            List<Event> foundEvents = await _eventRepository.GetUserEvents(userId);
+
+            if (foundEvents == null || foundEvents.Count <= 0) return [];
+
+            List<EventDTO> foundEventsDTOs = foundEvents.Select(e=>_mapper.Map<EventDTO>(e)).ToList();
+
+            return foundEventsDTOs;
+        }
     }
 }

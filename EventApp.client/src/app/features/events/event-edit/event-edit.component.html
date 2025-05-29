@@ -5,7 +5,7 @@
     <label>Название события*</label>
     <input formControlName="name" type="text" placeholder="Введите название">
     <div *ngIf="eventForm.get('name')?.invalid && eventForm.get('name')?.touched" class="error-message">
-      Название обязательно (макс. 100 символов)
+      Название обязательно (макс. 100 символов, мин. 4 символа)
     </div>
   </div>
 
@@ -13,7 +13,7 @@
     <label>Описание</label>
     <textarea formControlName="description" rows="4" placeholder="Введите описание"></textarea>
     <div *ngIf="eventForm.get('description')?.invalid && eventForm.get('description')?.touched" class="error-message">
-      Максимум 500 символов
+      Максимум 2000 символов
     </div>
   </div>
 
@@ -32,7 +32,7 @@
       <div *ngIf="eventForm.get('maxParticipantsCount')?.invalid 
                && eventForm.get('maxParticipantsCount')?.touched"
             class="error-message">
-        Минимум 4 участника
+        Минимум 4 участника, максимум - 300
       </div>
     </div>
   </div>
