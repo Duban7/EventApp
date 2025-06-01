@@ -1,0 +1,94 @@
+<form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="event-edit-form">
+  <h2>{{ isEditMode ? 'Редактирование события' : 'Создание события' }}</h2>
+  
+  <div class="form-group">
+    <label>Название события*</label>
+    <input formControlName="name" type="text" placeholder="Введите название">
+    <div *ngIf="eventForm.get('name')?.invalid && eventForm.get('name')?.touched" class="error-message">
+      Название обязательно (макс. 100 символов, мин. 4 символа)
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Описание</label>
+    <textarea formControlName="description" rows="4" placeholder="Введите описание"></textarea>
+    <div *ngIf="eventForm.get('description')?.invalid && eventForm.get('description')?.touched" class="error-message">
+      Максимум 2000 символов
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Дата начала*</label>
+      <input formControlName="startDate" [min]="tomorrow" type="date">
+      <div *ngIf="eventForm.get('startDate')?.invalid && eventForm.get('startDate')?.touched " class="error-message">
+        Укажите дату
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Макс. участников*</label>
+      <input formControlName="maxParticipantsCount" type="number" min="1">
+      <div *ngIf="eventForm.get('maxParticipantsCount')?.invalid 
+               && eventForm.get('maxParticipantsCount')?.touched"
+            class="error-message">
+        Минимум 4 участника, максимум - 300
+      </div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Место проведения*</label>
+      <input formControlName="eventPlace" type="text" placeholder="Введите место">
+      <div *ngIf="eventForm.get('eventPlace')?.invalid && eventForm.get('eventPlace')?.touched" class="error-message">
+        Обязательное поле (макс. 100 символов)
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Категория*</label>
+      <input formControlName="category" type="text" placeholder="Введите категорию">
+      <div *ngIf="eventForm.get('category')?.invalid && eventForm.get('category')?.touched" class="error-message">
+        Обязательное поле (макс. 50 символов)
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isEditMode" class="image-section">
+    <div *ngIf="currentImageUrl" class="current-image">
+      <img [src]="'Images/'+currentImageUrl" alt="Изображение события">
+      <p></p>
+      <button type="button" (click)="deleteImage()" class="delete-image-btn">
+        <i class="fas fa-trash"></i> Удалить изображение
+      </button>
+    </div>
+
+    <div *ngIf="!currentImageUrl" class="image-upload">
+      <input type="file" accept=".png, .jpg, image/png" (change)="onFileSelected($event)" #fileInput style="display: none;">
+      <button type="button" (click)="fileInput.click()" class="select-file-btn">
+        Выбрать изображение
+      </button>
+      <span *ngIf="selectedFile">{{ selectedFile.name }}</span>
+      <p></p>
+      <button *ngIf="selectedFile" type="button" (click)="uploadImage()" class="upload-btn">
+        <i class="fas fa-upload"></i> Загрузить
+      </button>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" [disabled]="eventForm.invalid || isLoading" class="submit-btn">
+      {{ isEditMode ? 'Обновить событие' : 'Создать событие' }}
+    </button>
+    <button type="button" [routerLink]="isEditMode ? ['../../../'] : ['../../']" class="cancel-btn">Отмена</button>
+  </div>
+
+  <div *ngIf="errorMessage" class="global-error">
+    <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+  </div>
+
+  <div *ngIf="isLoading" class="loading-overlay">
+    <i class="fas fa-spinner fa-spin"></i>
+  </div>
+</form>

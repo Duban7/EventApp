@@ -1,0 +1,75 @@
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+  <h2 class="form-title">Регистрация</h2>
+  
+  <div class="form-row">
+    <div class="form-group">
+      <input 
+        formControlName="name" 
+        placeholder="Имя"
+        class="form-input"
+        [class.invalid]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched">
+      <div *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched" 
+           class="validation-error">
+        Обязательное поле
+      </div>
+    </div>
+
+    <div class="form-group">
+      <input 
+        formControlName="surname" 
+        placeholder="Фамилия"
+        class="form-input"
+        [class.invalid]="registerForm.get('surname')?.invalid && registerForm.get('surname')?.touched">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <input 
+      formControlName="email" 
+      type="email" 
+      placeholder="Email"
+      class="form-input"
+      [class.invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+    <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" 
+         class="validation-error">
+      Введите корректный email
+    </div>
+  </div>
+
+  <div class="form-group">
+    <input 
+      formControlName="password" 
+      type="password" 
+      placeholder="Пароль"
+      class="form-input"
+      [class.invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+    <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" 
+         class="validation-error">
+      Минимум 6 символов
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="date-label">Дата рождения</label>
+    <input 
+      formControlName="dateOfBirth" 
+      type="date" 
+      class="form-input date-input"
+      [max]="yesterday | date:'yyyy-MM-dd'"
+      [class.invalid]="registerForm.get('dateOfBirth')?.invalid && registerForm.get('dateOfBirth')?.touched">
+  </div>
+
+  <button 
+    type="submit" 
+    [disabled]="registerForm.invalid || isLoading"
+    class="primary-button">
+    <span *ngIf="isLoading" class="button-loader">
+      <i class="fas fa-spinner fa-spin"></i> Регистрация...
+    </span>
+    <span *ngIf="!isLoading">Зарегистрироваться</span>
+  </button>
+
+  <div *ngIf="errorMessage" class="error-message">
+    <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+  </div>
+</form>

@@ -1,0 +1,84 @@
+<div class="event-details-container">
+  <div *ngIf="isLoading" class="loading-spinner">
+    <i class="fas fa-spinner fa-spin"></i> Загрузка...
+  </div>
+
+  <div *ngIf="!isLoading" class="event-content">
+    <h1 class="event-title">{{ event.name }}</h1>
+    
+    <div class="event-main">
+      <div class="event-image">
+        <img *ngIf="event.imagePath" [src]="'Images/'+event.imagePath || 'assets/default-event.jpg'" alt="Изображение события">
+      </div>
+      
+      <div class="event-info">
+        <div class="info-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Место: {{ event.eventPlace }}</span>
+        </div>
+        
+        <div class="info-item">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Дата проведения: {{ event.startDate | date:'dd.MM.yyyy' }}</span>
+        </div>
+        
+        <div class="info-item">
+          <i class="fas fa-tag"></i>
+          <span>Категория: {{ event.category }}</span>
+        </div>
+        
+        <div class="info-item">
+          <i class="fas fa-users"></i>
+          <span>Максимальное количество участников: {{ event.maxParticipantsCount }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="event-description">
+      <h3>Описание события</h3>
+      <p>{{ event.description }}</p>
+    </div>
+
+     <div class="event-actions">
+        <button 
+          (click)="toggleRegistration()" 
+          [disabled]="(event.isFull && !currentUserParticipant) || isRegistering"
+          [class.unregister]="currentUserParticipant"
+          class="register-button">
+          <span *ngIf="isRegistering">
+            <i class="fas fa-spinner fa-spin"></i> Обработка...
+          </span>
+          <span *ngIf="!isRegistering">
+            {{
+              currentUserParticipant ? 'Отписаться' : 
+              event.isFull ? 'Мест нет' : 'Записаться'
+            }}
+          </span>
+        </button>
+      </div>
+      
+    <div class="participants-section" *ngIf="participants.length > 0">
+        <h3>Участники события ({{ participants.length }})</h3>
+        <div class="participants-list">
+        <div class="participant-card" *ngFor="let participant of participants">
+            <div class="participant-avatar">
+            {{ participant.name.charAt(0) }}{{ participant.surname.charAt(0) }}
+            </div>
+            <div class="participant-info">
+            <div class="participant-name">
+                {{ participant.name }} {{ participant.surname }}
+            </div>
+            <div class="participant-email">
+                {{ participant.email }}
+            </div>
+            <div class="participant-date">
+                Зарегистрирован: {{ participant.registrationDateTime | date:'dd.MM.yyyy' }}
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    
+  </div>
+</div>

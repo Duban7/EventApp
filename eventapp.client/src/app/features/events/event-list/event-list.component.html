@@ -1,0 +1,133 @@
+<div class="event-list-container">
+  <div class="controls">
+     <button 
+      (click)="toggleFilters()" 
+      class="filter-button"
+      [class.active]="showFilters || isFiltered">
+      {{ showFilters ? 'Отменить' : (isFiltered ? 'Сбросить фильтры' : 'Фильтры') }}
+    </button>
+
+    <div class="page-size-selector">
+      <label for="pageSize">Элементов на странице:</label>
+      <select id="pageSize" 
+              [(ngModel)]="pageSize" 
+              (change)="changePageSize($event)">
+        <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
+      </select>
+    </div>
+  </div>
+  
+ <form *ngIf="showFilters" 
+        [formGroup]="filterForm" 
+        class="filters-panel"
+        (submit)="applyFilters()">
+    <div class="filter-row">
+      <div class="filter-field">
+        <label>Название события:</label>
+        <input type="text" formControlName="name" placeholder="Введите название">
+      </div>
+
+      <div class="filter-field">
+        <label>Категория:</label>
+        <input type="text" formControlName="category" placeholder="Введите категорию">
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="filter-field">
+        <label>Место проведения:</label>
+        <input type="text" formControlName="eventPlace" placeholder="Введите место">
+      </div>
+
+      <div class="filter-field">
+        <label>Дата проведения:</label>
+        <input type="date" formControlName="startDate">
+      </div>
+    </div>
+
+    <button (click)="applyFilters()" class="apply-button">
+      Применить фильтры
+    </button>
+ </form>
+  
+  <div *ngIf="isAdminMode" class="admin-controls">
+    <button class="add-button" [routerLink]="['event/new']">
+      Добавить событие
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-spinner">
+    <i class="fas fa-spinner fa-spin"></i> Загрузка...
+  </div>
+
+  <div *ngIf="!isLoading && eventsPage" class="content">
+    <div *ngIf="eventsPage.items.length === 0" class="no-results">
+      События не найдены
+    </div>
+
+    <div *ngIf="eventsPage.items.length > 0" class="events-grid">
+      <div *ngFor="let event of eventsPage.items" class="event-card">
+        
+      <h3>{{ event.name }}</h3>
+      <p *ngIf="event.isFull" style="color: red;"> Мест нет</p>
+      <p *ngIf="!event.isFull">{{ event.description | truncate:100 }}</p>
+      <div class="event-meta">
+        <span><i class="fas fa-calendar-alt"></i> {{ event.startDate | date:'mediumDate' }}</span>
+        <span><i class="fas fa-map-marker-alt"></i> Мето проведения: {{ event.eventPlace }}</span>
+        
+      </div>
+      <div class="event-actions">
+        <button class="btn-details" [routerLink]="['/event', event.id]">Подробнее</button>
+        <div *ngIf="isAdminMode" class="admin-actions">
+          <button class="edit-button" [routerLink]="['event/edit', event.id]">
+            Изменить
+          </button>
+          <button (click)="confirmDelete(event.id)" class="delete-button">
+            Удалить
+          </button>
+        </div>
+      </div>
+     
+      </div>
+    </div>
+
+    <div *ngIf="eventsPage.items.length > 0" class="pagination">
+      <button (click)="goToPage(1)" 
+              [disabled]="!eventsPage.hasPreviousPage">
+        &laquo;
+      </button>
+      <button (click)="goToPage(currentPage - 1)" 
+              [disabled]="!eventsPage.hasPreviousPage">
+        &lsaquo;
+      </button>
+
+      <button *ngFor="let page of getVisiblePages()" 
+              (click)="goToPage(page)"
+              [class.active]="page === currentPage">
+        {{ page }}
+      </button>
+
+      <button (click)="goToPage(currentPage + 1)" 
+              [disabled]="!eventsPage.hasNextPage">
+        &rsaquo;
+      </button>
+      <button (click)="goToPage(eventsPage.totalPages)" 
+              [disabled]="!eventsPage.hasNextPage">
+        &raquo;
+      </button>
+    </div>
+
+      <div *ngIf="showDeleteModal" class="modal-overlay">
+        <div class="modal-content">
+          <h3>Подтверждение удаления</h3>
+          <p>Вы уверены, что хотите удалить это событие?</p>
+          <div class="modal-actions">
+            <button (click)="cancelDelete()" class="cancel-button">Отмена</button>
+            <button (click)="deleteEvent()" class="confirm-button">Удалить</button>
+          </div>
+        </div>
+      </div>
+
+  </div>
+</div>
+

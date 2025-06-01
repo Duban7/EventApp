@@ -1,0 +1,22 @@
+services:
+  frontend:
+    image: eventappclient
+    build:
+      context: .
+      dockerfile: eventapp.client/Dockerfile
+    depends_on:
+      - backend
+  backend:
+    image: eventappserver
+    build:
+      context: .
+      dockerfile: EventApp.Server/Dockerfile
+    depends_on:
+        - db
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - SA_PASSWORD=anpWPFI3z4WVfso12FLtaehOswJNvxKPRKaoP9bILhpbjLnp5LHAy
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"

@@ -1,0 +1,81 @@
+<div class="profile-container">
+  <div *ngIf="isLoading" class="loading-overlay">
+    <i class="fas fa-spinner fa-spin"></i>
+  </div>
+
+  <div class="profile-card">
+    <h2>Профиль пользователя</h2>
+
+    <form [formGroup]="profileForm" class="profile-form">
+      <div class="form-group">
+        <label>Имя</label>
+        <input type="text" formControlName="name" [readonly]="!isEditing">
+      </div>
+
+      <div class="form-group">
+        <label>Фамилия</label>
+        <input type="text" formControlName="surname" [readonly]="!isEditing">
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" formControlName="email" readonly>
+      </div>
+
+      <div class="form-group">
+        <label>Дата рождения</label>
+        <input type="date" formControlName="birthDate" [readonly]="!isEditing" [max]="yesterday">
+      </div>
+
+      <div *ngIf="!isEditing" class="action-buttons">
+        <button type="button" (click)="logout()" class="logout-button">
+          Выйти
+        </button>
+        <button type="button" (click)="startEditing()" class="edit-button">
+          Изменить
+        </button>
+        <button *ngIf="!isAdmin" type="button" (click)="confirmDelete()" class="delete-button">
+          Удалить
+        </button>
+      </div>
+
+      <div *ngIf="isEditing" class="edit-buttons">
+        <button type="button" (click)="cancelEditing()" class="cancel-button">
+          Отменить
+        </button>
+        <button type="button" (click)="saveChanges()" class="save-button">
+          Сохранить
+        </button>
+      </div>
+    </form>
+
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+    </div>
+  </div>
+
+  <div class="user-events">
+    <h3>Мои события</h3>
+    <div *ngIf="userEvents.length === 0" class="no-events">
+      Вы не зарегистрированы ни на одно событие
+    </div>
+    <ul *ngIf="userEvents.length > 0" class="events-list">
+      <li *ngFor="let event of userEvents" class="event-item">
+        <a [routerLink]="['/event', event.id]">
+          {{ event.name }} - {{ event.startDate | date:'dd.MM.yyyy' }}
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="showDeleteConfirmation" class="confirmation-modal">
+    <div class="modal-content">
+      <h3>Подтверждение удаления</h3>
+      <p>Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.</p>
+      <div class="modal-actions">
+        <button (click)="cancelDelete()" class="cancel-button">Отмена</button>
+        <button (click)="deleteAccount()" class="confirm-button">Удалить</button>
+      </div>
+    </div>
+  </div>
+</div>
