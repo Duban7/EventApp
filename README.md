@@ -1,5 +1,3 @@
-# EventApp
-
 # Running the Application with Docker Compose
 
 This guide will help you set up and run the application in an isolated environment using Docker Compose.
@@ -13,8 +11,8 @@ This guide will help you set up and run the application in an isolated environme
 
 1. Clone the repository (if not already done):
    ```bash
-   git clone <your-repository>
-   cd <project-directory>
+   git clone https://github.com/Duban7/EventApp
+   cd EventApp
    ```
 
 2. Start the application using Docker compose:
@@ -30,3 +28,8 @@ This guide will help you set up and run the application in an isolated environme
    ```bash
    docker-compose down
    ```
+# Admin
+
+The application has a pre-installed administrator. Use these details to access the administrator:
+   + Login: admin@mail.com
+   + Password: admin1337
