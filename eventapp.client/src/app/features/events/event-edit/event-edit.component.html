@@ -57,7 +57,7 @@
 
   <div *ngIf="isEditMode" class="image-section">
     <div *ngIf="currentImageUrl" class="current-image">
-      <img [src]="'Images/'+currentImageUrl" alt="Изображение события">
+      <img [src]="'https://localhost:8081/Images/'+currentImageUrl" alt="Изображение события">
       <p></p>
       <button type="button" (click)="deleteImage()" class="delete-image-btn">
         <i class="fas fa-trash"></i> Удалить изображение
