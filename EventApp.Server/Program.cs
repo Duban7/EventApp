@@ -1,5 +1,4 @@
 using EventApp.DI;
-using EventApp.Helpers;
 using EventApp.Middlewares;
 using EventApp.Server.Helpers;
 using Microsoft.Extensions.FileProviders;

@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Services.Exeptions;
 using Services.Interfaces;
-using System;
 
 namespace Services.Services
 {

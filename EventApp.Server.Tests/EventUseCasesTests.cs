@@ -3,7 +3,6 @@ using AutoMapper;
 using Data.Interfaces;
 using Data.Models;
 using FluentValidation;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Services.DTOs;
@@ -11,9 +10,6 @@ using Services.Interfaces;
 using Services.Mapper;
 using Services.Services;
 using Services.Validators;
-using System.Threading.Tasks;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace Tests
 {

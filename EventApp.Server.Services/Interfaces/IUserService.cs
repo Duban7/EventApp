@@ -1,5 +1,4 @@
-﻿using Data.Models;
-using Services.DTOs;
+﻿using Services.DTOs;
 using System.Security.Claims;
 
 namespace Services.Interfaces
@@ -11,7 +10,7 @@ namespace Services.Interfaces
         public Task DeleteUser(string userId);
         public Task<UserDTO> LogIn(string email, string password);
         public Task<UserDTO?> GetUserById(string userId);
-        public Task<List<PartizipantDTO>?> GetUsersByEventId(int eventId);
+        public Task<List<ParticipantDTO>?> GetUsersByEventId(int eventId);
         public Task RegisterUserInEvent(string userId, int eventId);
         public Task UnregisterUserInEvent(string userId, int eventId);
         public Task<UserDTO> UpdateRefreshToken(string oldToken, string userId);

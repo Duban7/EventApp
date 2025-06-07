@@ -1,6 +1,4 @@
-﻿using Microsoft.Identity.Client;
-
-namespace Data.Models
+﻿namespace Data.Models
 {
     public class PaginatedList<T>
     {

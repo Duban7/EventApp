@@ -1,12 +1,8 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using Data.Interfaces;
 using Data.Models;
-using Data.Repositories;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Extensions.Logging;
 using Services.DTOs;
 using Services.Exeptions;
 using Services.Interfaces;

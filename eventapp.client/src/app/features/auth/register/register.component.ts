@@ -13,7 +13,6 @@ import { CommonModule } from '@angular/common';
 export class RegisterComponent {
   registerForm: FormGroup;
   isLoading = false;
-  maxDate = new Date();
   errorMessage = '';
   yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0];
 
@@ -23,8 +22,6 @@ export class RegisterComponent {
     private authService: AuthService,
     private router : Router
   ) {
-    this.maxDate.setFullYear(this.maxDate.getFullYear() - 14); // Минимум 14 лет
-
     this.registerForm = this.fb.group({
       name: ['', Validators.required],
       surname: ['', Validators.required],

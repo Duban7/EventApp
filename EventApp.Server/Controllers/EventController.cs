@@ -1,5 +1,4 @@
-﻿using Data.Interfaces;
-using Data.Models;
+﻿using Data.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,12 +9,12 @@ namespace EventApp.Controllers
 {
     [ApiController]
     [Route("EventApi/event")]
-    public class EventContorller : ControllerBase
+    public class EventController : ControllerBase
     {
         private readonly IEventService _eventService;
-        private readonly ILogger<EventContorller> _logger;
-        public EventContorller(IEventService eventService,
-                               ILogger<EventContorller> logger)
+        private readonly ILogger<EventController> _logger;
+        public EventController(IEventService eventService,
+                               ILogger<EventController> logger)
         {
             _eventService = eventService;
             _logger = logger;

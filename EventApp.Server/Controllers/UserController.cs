@@ -13,14 +13,12 @@ namespace EventApp.Controllers
     {
         private readonly IUserService _userService;
         private readonly ITokenService _tokenService;
-        private readonly ILogger<UserController> _logger;
         public UserController(IUserService userService,
                               ITokenService tokenService,
                               ILogger<UserController> logger)
         {
             _userService = userService;
             _tokenService = tokenService;
-            _logger = logger;
         }
 
         [HttpPost]
@@ -47,7 +45,7 @@ namespace EventApp.Controllers
         [Route("delete")]
         public async Task<ActionResult> DeleteUser()
         {
-            await  _userService.DeleteUser(GetUserId());
+            await _userService.DeleteUser(GetUserId());
 
             return Ok();
         }
@@ -71,9 +69,9 @@ namespace EventApp.Controllers
 
         [HttpGet]
         [Route("get-event-participants/{eventId}")]
-        public async Task<ActionResult<List<PartizipantDTO>>> GetEventParticipants(int eventId)
+        public async Task<ActionResult<List<ParticipantDTO>>> GetEventParticipants(int eventId)
         {
-            List<PartizipantDTO>? foundUsers = await _userService.GetUsersByEventId(eventId);
+            List<ParticipantDTO>? foundUsers = await _userService.GetUsersByEventId(eventId);
 
             return Ok(foundUsers);
         }
@@ -83,9 +81,9 @@ namespace EventApp.Controllers
         [Route("get/{userId}")]
         public async Task<ActionResult<UserDTO>> GetUser(string userId)
         {
-            UserDTO? foudnUser = await _userService.GetUserById(userId);
+            UserDTO? foundUser = await _userService.GetUserById(userId);
 
-            return Ok(foudnUser);
+            return Ok(foundUser);
         }
 
         [HttpPost]

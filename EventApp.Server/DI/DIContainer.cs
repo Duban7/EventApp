@@ -14,7 +14,6 @@ using Services.Jwt;
 using Services.Mapper;
 using Services.Services;
 using Services.Validators;
-using System.Reflection;
 
 namespace EventApp.DI
 {
@@ -98,7 +97,7 @@ namespace EventApp.DI
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(opt =>
             {
-                opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MindTrackerAPI", Version = "v1" });
+                opt.SwaggerDoc("v1", new OpenApiInfo { Title = "EventAppAPI", Version = "v1" });
                 opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Data.Interfaces;
 using Data.Models;
 using FluentValidation;
@@ -102,11 +101,11 @@ namespace Services.Services
             return userDTO;
         }
 
-        public async Task<List<PartizipantDTO>?> GetUsersByEventId(int eventId)
+        public async Task<List<ParticipantDTO>?> GetUsersByEventId(int eventId)
         {
             if (await _eventRepository.GetEventById(eventId) == null) throw new NotFoundException("Event not found");
 
-            List<PartizipantDTO> foundUsers =  _userManager.Users
+            List<ParticipantDTO> foundUsers =  _userManager.Users
                 .Where(u => u.EventParticipations
                 .Any(ep => ep.EventId == eventId))
                 .Include(u=>u.EventParticipations)
@@ -114,7 +113,7 @@ namespace Services.Services
                 .AsEnumerable()
                 .Select(u =>
                 {
-                    var dto = _mapper.Map<User, PartizipantDTO>(u);
+                    var dto = _mapper.Map<User, ParticipantDTO>(u);
                     dto.RegistrationDateTime = u.EventParticipations.FirstOrDefault(ep => ep.EventId == eventId).RegistrationDate;
                     return dto;
                 })
