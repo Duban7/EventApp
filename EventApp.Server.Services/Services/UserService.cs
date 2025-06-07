@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Data.Interfaces;
 using Data.Models;
 using FluentValidation;
@@ -91,7 +92,9 @@ namespace Services.Services
 
         public async Task<UserDTO?> GetUserById(string userId)
         {
-            User? foundUser = await _userManager.FindByIdAsync(userId);
+            User? foundUser = await _userManager.Users.AsNoTracking()
+                                                      .Where(u=>u.Id == userId)
+                                                      .FirstOrDefaultAsync();
             if (foundUser == null) throw new NotFoundException("User not found");
 
             UserDTO userDTO = _mapper.Map<UserDTO>(foundUser);
@@ -103,17 +106,19 @@ namespace Services.Services
         {
             if (await _eventRepository.GetEventById(eventId) == null) throw new NotFoundException("Event not found");
 
-            List<PartizipantDTO> foundUsers = await _userManager.Users
-                .Where(u => u.EventParticipations.Any(ep => ep.EventId == eventId))
-                .Select(u=> new PartizipantDTO
+            List<PartizipantDTO> foundUsers =  _userManager.Users
+                .Where(u => u.EventParticipations
+                .Any(ep => ep.EventId == eventId))
+                .Include(u=>u.EventParticipations)
+                .AsNoTracking()
+                .AsEnumerable()
+                .Select(u =>
                 {
-                    Id = u.Id,
-                    Email = u.Email,
-                    Name = u.Name,
-                    Surname = u.Surname,
-                    RegistrationDateTime = u.EventParticipations.First(ep=>ep.EventId == eventId).RegistrationDate
+                    var dto = _mapper.Map<User, PartizipantDTO>(u);
+                    dto.RegistrationDateTime = u.EventParticipations.FirstOrDefault(ep => ep.EventId == eventId).RegistrationDate;
+                    return dto;
                 })
-                .ToListAsync();
+                .ToList();
 
             if (foundUsers.Count <= 0 ) return [];
             
@@ -214,7 +219,9 @@ namespace Services.Services
 
         public async Task<IList<Claim>> GetUserClaims(string userId)
         {
-            User? user = await _userManager.FindByIdAsync(userId);
+            User? user = await _userManager.Users.AsNoTracking()
+                                                 .Where(u => u.Id == userId)
+                                                 .FirstOrDefaultAsync();
             if (user == null) throw new Exception("Couldn't find user in claimsGet");
 
             return await _userManager.GetClaimsAsync(user);

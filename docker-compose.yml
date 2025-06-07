@@ -1,3 +1,5 @@
+name: eventapp
+
 services:
   frontend:
     image: eventappclient

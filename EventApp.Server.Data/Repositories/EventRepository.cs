@@ -25,6 +25,7 @@ namespace Data.Repositories
         }
         public Task<Event?> GetEventById(int eventId) =>
             _context.Events
+            .AsNoTracking()
             .Where(e => e.Id == eventId)
             .Include(e=>e.Participants)
             .FirstOrDefaultAsync();
@@ -32,13 +33,16 @@ namespace Data.Repositories
 
 
         public Task<Event?> GetEventByName(string eventName) =>
-            _context.Events.Where(e => e.Name == eventName)
+            _context.Events
+            .AsNoTracking()
+            .Where(e => e.Name == eventName)
             .Include(e => e.Participants)
             .FirstOrDefaultAsync();
 
         public async Task<PaginatedList<Event>> GetEvents(int pageIndex, int pageSize)
         {
             List<Event>? events = await _context.Events
+            .AsNoTracking()
             .OrderBy(e => e.StartDate)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
@@ -54,8 +58,6 @@ namespace Data.Repositories
         {
             var query = _context.Events.AsQueryable<Event>();
 
-            var list = query.ToList();
-
             if (filter.Name != null)
                 query = query.Where(x => x.Name.Contains(filter.Name));
             if (filter.Category != null)
@@ -65,11 +67,11 @@ namespace Data.Repositories
             if (filter.EventPlace != null)
                 query = query.Where(x => x.EventPlace.Contains(filter.EventPlace));
 
-            List<Event>? events = await query
-                .OrderBy(e => e.StartDate)
-                .Skip((pageIndex - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            query = query.OrderBy(e => e.StartDate)
+                         .Skip((pageIndex - 1) * pageSize)
+                         .Take(pageSize);
+
+            List<Event>? events = await query.AsNoTracking().ToListAsync();
 
             var count = await query.CountAsync();
             var totalPages = (int)Math.Ceiling(count / (double)pageSize);
