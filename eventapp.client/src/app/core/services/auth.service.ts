@@ -10,7 +10,7 @@ import { Router } from "@angular/router";
     providedIn: "root"
 })
 export class AuthService{
-    private readonly apiUrl = "https://localhost:8081/EventApi/user";
+    private readonly apiUrl = "http://localhost:8080/EventApi/user";
     private currentUserSubject: BehaviorSubject<User | null>;
      public currentUser: Observable<User | null>;
 

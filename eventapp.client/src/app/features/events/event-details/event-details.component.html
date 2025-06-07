@@ -8,7 +8,7 @@
     
     <div class="event-main">
       <div class="event-image">
-        <img *ngIf="event.imagePath" [src]="'https://localhost:8081/Images/'+event.imagePath || 'assets/default-event.jpg'" alt="Изображение события">
+        <img *ngIf="event.imagePath" [src]="'http://localhost:8080/Images/'+event.imagePath || 'assets/default-event.jpg'" alt="Изображение события">
       </div>
       
       <div class="event-info">

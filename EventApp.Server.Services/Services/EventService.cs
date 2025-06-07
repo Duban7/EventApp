@@ -134,7 +134,7 @@ namespace Services.Services
         {
             Event? foundEvent = await _eventRepository.GetEventById(eventId);
             if (foundEvent == null) throw new NotFoundException("Event not found");
-            if (foundEvent.ImagePath == null) throw new BadRequestException("Event doesn't have image");
+            if (foundEvent.ImagePath == null) return;
 
             _imageService.DeleteImage(foundEvent.ImagePath);
 

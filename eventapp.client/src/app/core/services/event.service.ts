@@ -13,8 +13,8 @@ import { Participant } from "../models/participant";
     providedIn: 'root'
 })
 export class EventService{
-  private apiUrl = 'https://localhost:8081/EventApi/event';
-  private userApiUrl = 'https://localhost:8081/EventApi/user';
+  private apiUrl = 'http://localhost:8080/EventApi/event';
+  private userApiUrl = 'http://localhost:8080/EventApi/user';
 
     constructor(private http: HttpClient){
 

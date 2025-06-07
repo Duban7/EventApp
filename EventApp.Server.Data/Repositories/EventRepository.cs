@@ -26,7 +26,6 @@ namespace Data.Repositories
 
         public Task<Event?> GetEventById(int eventId) =>
             _context.Events
-            .AsNoTracking()
             .Where(e => e.Id == eventId)
             .Include(e=>e.Participants)
             .FirstOrDefaultAsync();
@@ -83,7 +82,7 @@ namespace Data.Repositories
             _context.Events.Update(updatedEvent);
             await _context.SaveChangesAsync();
 
-            return await _context.Events.FirstOrDefaultAsync(e => e.Name == updatedEvent.Name);
+            return await _context.Events.AsNoTracking().FirstOrDefaultAsync(e => e.Name == updatedEvent.Name);
         }
 
         public async Task<List<Event>> GetUserEvents(string userId)=>
@@ -93,7 +92,6 @@ namespace Data.Repositories
 
         public async Task<int> GetEventParticipantsCount(int eventId) =>
             _context.Events.Where(e => e.Id == eventId)
-                           .AsNoTracking()
                            .Select(e => e.Participants.Count)
                            .FirstOrDefault();
     }

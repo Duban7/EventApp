@@ -23,8 +23,6 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseRouting();
 app.UseCors("AllowWithCredentials");
 
-//app.UseHttpsRedirection();
-
 app.UseSwagger();
 app.UseSwaggerUI();
 

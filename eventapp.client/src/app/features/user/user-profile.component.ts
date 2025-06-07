@@ -55,7 +55,7 @@ export class ProfileComponent implements OnInit {
           name: user.name,
           surname: user.surname,
           email: user.email,
-          birthDate: user.birthDate ? new Date(new Date().setDate(new Date(user.birthDate).getDate())).toISOString().split('T')[0] : null
+          birthDate: user.birthDate ? new Date(new Date().setDate(new Date(user.birthDate).getDate()+1)).toISOString().split('T')[0] : null
         });
         this.isAdmin = this.authService.isAdmin;
       }
