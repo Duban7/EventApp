@@ -9,17 +9,17 @@ namespace Services.Validators
     {
         public EventValidator()
         {
-            string msg = "Error in property {PropertyName}: value {PropertyValue}";
+            string msg = "Property cannot be null";
             string lengthMsg = "Invalid length for {PropertyName}";
 
             RuleFor(e => e.Name)
                 .Length(4, 40).WithMessage(lengthMsg);
 
             RuleFor(e => e.StartDate)
-                .Must(sd => sd.Value > DateTime.Now).WithMessage(msg);
+                .NotEmpty().WithMessage(msg);
 
             RuleFor(e => e.MaxParticipantsCount)
-                .Must(mp => 3 < mp && mp < 300).WithMessage(msg);
+                .NotEmpty().WithMessage(msg);
         }
         protected override void RaiseValidationException(ValidationContext<Event> context, ValidationResult result)
         {

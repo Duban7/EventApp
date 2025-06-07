@@ -8,7 +8,7 @@
         public DateTime? StartDate { get; set; }
         public string? EventPlace { get; set; } = "not specified";
         public string Category { get; set; } = "No category";
-        public int MaxParticipantsCount { get; set; } = 30;
+        public int MaxParticipantsCount { get; set; }
         public bool IsFull { get; set; } = false;
         public string? ImagePath { get; set; } 
         public List<User>? Participants { get; set; }

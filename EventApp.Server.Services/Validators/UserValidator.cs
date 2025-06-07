@@ -2,7 +2,6 @@
 using FluentValidation;
 using FluentValidation.Results;
 using Services.Exeptions;
-using System.Text.RegularExpressions;
 
 namespace Services.Validators
 {
@@ -23,11 +22,8 @@ namespace Services.Validators
                 .Length(2, 50).WithMessage(lengthMsg);
 
             RuleFor(user => user.BirthDate)
-                .Must(bd => bd.Value < DateTime.Now).WithMessage(msg);
+                .NotEmpty().WithMessage(msg);
         }
-
-        public static bool IsPasswordValid(string password) =>
-            Regex.IsMatch(password, @"(?=.*[0-9])(?=.*[A-Za-z])[0-9a-zA-Z_\-]{6,100}");
 
         protected override void RaiseValidationException(ValidationContext<User> context, ValidationResult result)
         {

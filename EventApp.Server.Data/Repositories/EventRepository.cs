@@ -87,7 +87,7 @@ namespace Data.Repositories
             return await _context.Events.FirstOrDefaultAsync(e => e.Name == updatedEvent.Name);
         }
         public async Task<List<Event>> GetUserEvents(string userId)=>
-            await _context.Events.Where(e=>e.Participants.Any(u=>u.Id == userId)).ToListAsync();
+            await _context.Events.Where(e=>e.Participants.Any(u=>u.Id == userId)).AsNoTracking().ToListAsync();
         public async Task<int> GetEventParticipantsCount(int eventId) =>
             _context.Events.Where(e => e.Id == eventId).Select(e => e.Participants.Count).FirstOrDefault();
     }

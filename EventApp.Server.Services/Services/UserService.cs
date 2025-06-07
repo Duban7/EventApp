@@ -10,6 +10,7 @@ using Services.Exeptions;
 using Services.Interfaces;
 using Services.Validators;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace Services.Services
 {
@@ -42,7 +43,10 @@ namespace Services.Services
             string password = newUserDTO.Password ?? throw new BadRequestException("Password wasn't sent");
 
             _userValidator.ValidateAndThrow(newUser);
-            if (!UserValidator.IsPasswordValid(password)) throw new BadRequestException("Password should contain at least 1 letter and 1 number. Minimal password length - 6, max - 100."); 
+            if (newUser.BirthDate >= DateTime.Now) throw new BadRequestException("User cannot be born in future");
+
+            if (!Regex.IsMatch(password, @"(?=.*[0-9])(?=.*[A-Za-z])[0-9a-zA-Z_\-]{6,100}"))
+                throw new BadRequestException("Password should contain at least 1 letter and 1 number. Minimal password length - 6, max - 100."); 
 
             User? foundUser = await _userManager.FindByEmailAsync(newUser.Email!);
             if (foundUser != null) throw new ConflictException("User already exists");
@@ -51,8 +55,7 @@ namespace Services.Services
             newUser.RefreshExpires = DateTime.Now.AddDays(7);
             newUser.UserName = newUser.Email;
 
-            var res = await _userManager.CreateAsync(newUser, password);
-            if (!res.Succeeded) throw new InternalErrorException("Couldn't create User" + res.Errors.ToString());
+            await _userManager.CreateAsync(newUser, password);
 
             foundUser = await _userManager.FindByEmailAsync(newUser.Email!) ?? throw new NotFoundException("User not found");
 
@@ -64,11 +67,9 @@ namespace Services.Services
                 new Claim(ClaimTypes.Role, "User")
                 ];
 
-            res = await _userManager.AddClaimsAsync(foundUser, userClaims);
-            if (!res.Succeeded) throw new InternalErrorException("Couldn't add Claims");
+            await _userManager.AddClaimsAsync(foundUser, userClaims);
 
-            res = await _userManager.AddToRoleAsync(foundUser, "User");
-            if (!res.Succeeded) throw new InternalErrorException("Couldn't add Role");
+            await _userManager.AddToRoleAsync(foundUser, "User");
 
             UserDTO userDTO = _mapper.Map<UserDTO>(foundUser);
             UserTokenDTO userTokenDTO = new();
@@ -86,8 +87,7 @@ namespace Services.Services
             User? foundUser = await _userManager.FindByIdAsync(userId);
             if (foundUser == null) throw new NotFoundException("User not found");
 
-            var res = await _userManager.DeleteAsync(foundUser);
-            if (!res.Succeeded) throw new InternalErrorException("Couldn't delete User");
+            await _userManager.DeleteAsync(foundUser);
         }
 
         public async Task<UserDTO?> GetUserById(string userId)
@@ -119,8 +119,6 @@ namespace Services.Services
                     return dto;
                 })
                 .ToList();
-
-            if (foundUsers.Count <= 0 ) return [];
             
             return foundUsers;
         }
@@ -131,7 +129,6 @@ namespace Services.Services
             if(!res.Succeeded) throw new BadRequestException("Invalid email or password");
 
             User? foundUser = await _userManager.FindByEmailAsync(email);
-            if (foundUser == null) throw new NotFoundException("User not found");
 
             foundUser.RefreshToken = _tokenService.GenerateRefreshToken();
             foundUser.RefreshExpires = DateTime.Now.AddDays(7);
@@ -157,7 +154,6 @@ namespace Services.Services
             foundEvent.Participants?.Add(foundUser);
 
             if (foundEvent.Participants.Count == foundEvent.MaxParticipantsCount) foundEvent.IsFull = true;
-            if (foundEvent.Participants.Count > foundEvent.MaxParticipantsCount) throw new InternalErrorException("Somehow you added more participants than you could");
 
             await _eventRepository.UpdateEvent(foundEvent);
         }
@@ -182,6 +178,7 @@ namespace Services.Services
             User updatedUser = _mapper.Map<User>(updatedUserDTO);
 
             _userValidator.ValidateAndThrow(updatedUser);
+            if (updatedUser.BirthDate >= DateTime.Now) throw new BadRequestException("User cannot be born in future");
 
             User? foundUser = await _userManager.FindByEmailAsync(updatedUser.Email!);
             if (foundUser == null) throw new NotFoundException("User not found");
@@ -195,8 +192,7 @@ namespace Services.Services
             if (updatedUser.BirthDate != null) 
                 foundUser.BirthDate = updatedUser.BirthDate;
 
-            var res = await _userManager.UpdateAsync(foundUser);
-            if (!res.Succeeded) throw new InternalErrorException("Couldn't update User");
+            await _userManager.UpdateAsync(foundUser);
 
             UserDTO userDTO = _mapper.Map<UserDTO>(foundUser);
 
@@ -222,7 +218,6 @@ namespace Services.Services
             User? user = await _userManager.Users.AsNoTracking()
                                                  .Where(u => u.Id == userId)
                                                  .FirstOrDefaultAsync();
-            if (user == null) throw new Exception("Couldn't find user in claimsGet");
 
             return await _userManager.GetClaimsAsync(user);
         } 

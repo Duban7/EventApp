@@ -34,13 +34,16 @@ namespace Services.Services
             Event newEvent = _mapper.Map<Event>(newEventDTO);
 
             _eventValidator.ValidateAndThrow(newEvent);
+            if (newEvent.StartDate < DateTime.Now) throw new BadRequestException("Event cannot start in past");
+            if (newEvent.MaxParticipantsCount < 3 || newEvent.MaxParticipantsCount > 300)
+                throw new BadRequestException("Partitipants count should be more than 3 and less than 300");
 
             Event? foundEvent = await _eventRepository.GetEventByName(newEvent.Name!);
             if (foundEvent != null) throw new ConflictException("Event already exists");
 
             await _eventRepository.CreateEvent(newEvent);
 
-            Event createdEvent = (await _eventRepository.GetEventByName(newEvent.Name)) ?? throw new InternalErrorException("event wasn't created");
+            Event? createdEvent = await _eventRepository.GetEventByName(newEvent.Name);
 
             EventDTO eventDTO = _mapper.Map<EventDTO>(createdEvent);
 
@@ -78,7 +81,6 @@ namespace Services.Services
             Event filter = _mapper.Map<Event>(filterDTO);
 
             var res = await _eventRepository.GetEventsFiltered(filter, pageIndex, pageSize);
-            if (res == null) throw new NotFoundException("Events not found");
 
             var dtos = res.items?.Select(_mapper.Map<EventDTO>).ToList();
 
@@ -87,9 +89,7 @@ namespace Services.Services
 
         public async Task<PaginatedList<EventDTO>> GetEvents(int pageIndex, int PageSize)
         {
-            var res = (await _eventRepository.GetEvents(pageIndex, PageSize)) ?? throw new NotFoundException("Event not found");
-
-            if (res == null) throw new NotFoundException("Events not found");
+            var res = await _eventRepository.GetEvents(pageIndex, PageSize);
 
             var dtos = res.items?.Select(_mapper.Map<EventDTO>).ToList();
 
@@ -101,7 +101,9 @@ namespace Services.Services
             Event updatedEvent = _mapper.Map<Event>(updatedEventDTO);
 
             _eventValidator.ValidateAndThrow(updatedEvent);
-            if (updatedEvent.Id == null) throw new BadRequestException("Event id wan't sent");
+            if (updatedEvent.StartDate < DateTime.Now) throw new BadRequestException("Event cannot start in past");
+            if (updatedEvent.MaxParticipantsCount < 3 || updatedEvent.MaxParticipantsCount > 300)
+                throw new BadRequestException("Partitipants count should be more than 3 and less than 300");
 
             Event? foundEvent = await _eventRepository.GetEventById(updatedEvent.Id);
             if (foundEvent == null) throw new NotFoundException("Event not found");
@@ -126,7 +128,7 @@ namespace Services.Services
                 foundEvent.MaxParticipantsCount = updatedEvent.MaxParticipantsCount; 
             }
 
-            Event? resEvent = (await _eventRepository.UpdateEvent(foundEvent)) ?? throw new InternalErrorException("event wasn't updated");
+            Event? resEvent = (await _eventRepository.UpdateEvent(foundEvent));
 
             EventDTO resEventDTO = _mapper.Map<EventDTO>(resEvent);
 
@@ -176,8 +178,6 @@ namespace Services.Services
         public async Task<List<EventDTO>> GetUserEvents(string userId)
         {
             List<Event> foundEvents = await _eventRepository.GetUserEvents(userId);
-
-            if (foundEvents == null || foundEvents.Count <= 0) return [];
 
             List<EventDTO> foundEventsDTOs = foundEvents.Select(e=>_mapper.Map<EventDTO>(e)).ToList();
 
