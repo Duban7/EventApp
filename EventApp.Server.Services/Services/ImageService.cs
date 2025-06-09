@@ -13,7 +13,7 @@ namespace Services.Services
         {
             rootPath = environment.ContentRootPath;
         }
-        public async Task<string> SaveImageAsync(IFormFile imageFile)
+        public async Task<string> SaveImageAsync(IFormFile imageFile, CancellationToken cancellationToken)
         {
             if(imageFile == null)
                 throw new BadRequestException("Image wasn't sent");
@@ -30,7 +30,7 @@ namespace Services.Services
             var fileName = $"{Guid.NewGuid().ToString()}{ext}";
             var fileNameWithPath = Path.Combine(path, fileName);
             using var stream = new FileStream(fileNameWithPath, FileMode.Create);
-            await imageFile.CopyToAsync(stream);
+            await imageFile.CopyToAsync(stream, cancellationToken);
 
             return fileName;
         }
@@ -42,17 +42,17 @@ namespace Services.Services
             var path = Path.Combine(rootPath, "Uploads", "EventsImages", imageNameWithExtension);
             if (!File.Exists(path))
                 throw new FileNotFoundException($"Invalid file path");
-           
+
             File.Delete(path);
         }
 
         public (FileStream,string) GetImageStream(string imageNameWithExtension)
         {
             string path = Path.Combine(rootPath, "Uploads", "EventsImages", imageNameWithExtension);
-            if (!System.IO.File.Exists(path))
+            if (!File.Exists(path))
                 throw new BadRequestException("image not found");
 
-            var imageFileStream = System.IO.File.OpenRead(path);
+            var imageFileStream = File.OpenRead(path);
             var ext = Path.GetExtension(imageNameWithExtension);
 
             return (imageFileStream,ext);

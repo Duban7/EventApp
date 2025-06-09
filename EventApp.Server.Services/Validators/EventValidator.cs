@@ -18,6 +18,15 @@ namespace Services.Validators
             RuleFor(e => e.StartDate)
                 .NotEmpty().WithMessage(msg);
 
+            RuleFor(e => e.Description)
+                .NotEmpty().WithMessage(msg);
+
+            RuleFor(e => e.Category)
+                .NotEmpty().WithMessage(msg);
+
+            RuleFor(e => e.EventPlace)
+                .NotEmpty().WithMessage(msg);
+
             RuleFor(e => e.MaxParticipantsCount)
                 .NotEmpty().WithMessage(msg);
         }

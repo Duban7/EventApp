@@ -54,6 +54,7 @@ namespace Services.Mapper
             
             CreateMap<UpdateEventDTO, Event>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt=>opt.MapFrom(src=>"Name"))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate))
                 .ForMember(dest => dest.EventPlace, opt => opt.MapFrom(src => src.EventPlace))

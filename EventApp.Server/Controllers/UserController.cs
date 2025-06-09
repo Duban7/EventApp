@@ -14,8 +14,7 @@ namespace EventApp.Controllers
         private readonly IUserService _userService;
         private readonly ITokenService _tokenService;
         public UserController(IUserService userService,
-                              ITokenService tokenService,
-                              ILogger<UserController> logger)
+                              ITokenService tokenService)
         {
             _userService = userService;
             _tokenService = tokenService;
@@ -69,9 +68,9 @@ namespace EventApp.Controllers
 
         [HttpGet]
         [Route("get-event-participants/{eventId}")]
-        public async Task<ActionResult<List<ParticipantDTO>>> GetEventParticipants(int eventId)
+        public async Task<ActionResult<List<ParticipantDTO>>> GetEventParticipants(int eventId, CancellationToken cancellationToken)
         {
-            List<ParticipantDTO>? foundUsers = await _userService.GetUsersByEventId(eventId);
+            List<ParticipantDTO>? foundUsers = await _userService.GetUsersByEventId(eventId, cancellationToken);
 
             return Ok(foundUsers);
         }
@@ -89,9 +88,9 @@ namespace EventApp.Controllers
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "UserPolicy")]
         [Route("reg-event/{eventId}")]
-        public async Task<ActionResult> RegUserEvent(int eventId)
+        public async Task<ActionResult> RegUserEvent(int eventId, CancellationToken cancellationToken)
         {
-            await _userService.RegisterUserInEvent(GetUserId(), eventId);
+            await _userService.RegisterUserInEvent(GetUserId(), eventId, cancellationToken);
 
             return Ok();
         }
@@ -99,9 +98,9 @@ namespace EventApp.Controllers
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "UserPolicy")]
         [Route("unreg-event/{eventId}")]
-        public async Task<ActionResult> UnregUserEvent(int eventId)
+        public async Task<ActionResult> UnregUserEvent(int eventId, CancellationToken cancellationToken)
         {
-            await _userService.UnregisterUserInEvent(GetUserId(), eventId);
+            await _userService.UnregisterUserInEvent(GetUserId(), eventId, cancellationToken);
 
             return Ok();
         }

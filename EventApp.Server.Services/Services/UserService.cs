@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Services.DTOs;
 using Services.Exeptions;
 using Services.Interfaces;
-using Services.Validators;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 
@@ -91,9 +90,7 @@ namespace Services.Services
 
         public async Task<UserDTO?> GetUserById(string userId)
         {
-            User? foundUser = await _userManager.Users.AsNoTracking()
-                                                      .Where(u=>u.Id == userId)
-                                                      .FirstOrDefaultAsync();
+            User? foundUser = await _userManager.FindByIdAsync(userId);
             if (foundUser == null) throw new NotFoundException("User not found");
 
             UserDTO userDTO = _mapper.Map<UserDTO>(foundUser);
@@ -101,9 +98,9 @@ namespace Services.Services
             return userDTO;
         }
 
-        public async Task<List<ParticipantDTO>?> GetUsersByEventId(int eventId)
+        public async Task<List<ParticipantDTO>?> GetUsersByEventId(int eventId, CancellationToken cancellationToken)
         {
-            if (await _eventRepository.GetEventById(eventId) == null) throw new NotFoundException("Event not found");
+            if (await _eventRepository.GetEventById(eventId, cancellationToken) == null) throw new NotFoundException("Event not found");
 
             List<ParticipantDTO> foundUsers =  _userManager.Users
                 .Where(u => u.EventParticipations
@@ -113,6 +110,7 @@ namespace Services.Services
                 .AsEnumerable()
                 .Select(u =>
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     var dto = _mapper.Map<User, ParticipantDTO>(u);
                     dto.RegistrationDateTime = u.EventParticipations.FirstOrDefault(ep => ep.EventId == eventId).RegistrationDate;
                     return dto;
@@ -140,12 +138,12 @@ namespace Services.Services
             return userDTO;
         }
 
-        public async Task RegisterUserInEvent(string userId, int eventId)
+        public async Task RegisterUserInEvent(string userId, int eventId, CancellationToken cancellationToken)
         {
             User? foundUser = await _userManager.FindByIdAsync(userId);
             if (foundUser == null) throw new NotFoundException("User not found");
 
-            Event? foundEvent = await _eventRepository.GetEventById(eventId);
+            Event? foundEvent = await _eventRepository.GetEventById(eventId, cancellationToken);
             if (foundEvent == null) throw new NotFoundException("Event not found");
             if (foundEvent.IsFull) throw new BadRequestException("Event is full");
             if (foundEvent.Participants.Any(p => p.Id == foundUser.Id)) throw new BadRequestException("User already registered in this event");
@@ -157,12 +155,12 @@ namespace Services.Services
             await _eventRepository.UpdateEvent(foundEvent);
         }
 
-        public async Task UnregisterUserInEvent(string userId, int eventId)
+        public async Task UnregisterUserInEvent(string userId, int eventId, CancellationToken cancellationToken)
         {
             User? foundUser = await _userManager.FindByIdAsync(userId);
             if (foundUser == null) throw new NotFoundException("User not found");
 
-            Event? foundEvent = await _eventRepository.GetEventById(eventId);
+            Event? foundEvent = await _eventRepository.GetEventById(eventId, cancellationToken);
             if (foundEvent == null) throw new NotFoundException("Event not found");
 
             foundEvent.Participants?.Remove(foundUser);
@@ -206,6 +204,8 @@ namespace Services.Services
             if (foundUser.RefreshExpires < DateTime.Now) throw new BadRequestException("Token is expired");
 
             foundUser.RefreshToken = _tokenService.GenerateRefreshToken();
+            foundUser.RefreshExpires = DateTime.Now.AddDays(7);
+            await _userManager.UpdateAsync(foundUser);
 
             UserDTO userDTO = _mapper.Map<UserDTO>(foundUser);
 
@@ -214,9 +214,7 @@ namespace Services.Services
 
         public async Task<IList<Claim>> GetUserClaims(string userId)
         {
-            User? user = await _userManager.Users.AsNoTracking()
-                                                 .Where(u => u.Id == userId)
-                                                 .FirstOrDefaultAsync();
+            User? user = await _userManager.FindByIdAsync(userId);
 
             return await _userManager.GetClaimsAsync(user);
         } 

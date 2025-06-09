@@ -16,9 +16,11 @@ namespace Services.Validators
                 .EmailAddress().WithMessage(msg);
 
             RuleFor(user => user.Name)
+                .NotEmpty()
                 .Length(2, 30).WithMessage(lengthMsg);
 
             RuleFor(user => user.Surname)
+                .NotEmpty()
                 .Length(2, 50).WithMessage(lengthMsg);
 
             RuleFor(user => user.BirthDate)

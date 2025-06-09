@@ -30,7 +30,7 @@ export class EventEditComponent implements OnInit {
   ) {
     this.eventForm = this.fb.group({
       name: ['', [Validators.required,Validators.minLength(4), Validators.maxLength(40)]],
-      description: ['', [Validators.maxLength(2000)]],
+      description: ['', [Validators.required, Validators.maxLength(2000)]],
       startDate: [this.tomorrow, [Validators.required]],
       eventPlace: ['', [Validators.required, Validators.maxLength(100)]],
       category: ['', [Validators.required, Validators.maxLength(50)]],

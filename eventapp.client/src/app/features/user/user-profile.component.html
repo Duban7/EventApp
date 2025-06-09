@@ -10,11 +10,17 @@
       <div class="form-group">
         <label>Имя</label>
         <input type="text" formControlName="name" [readonly]="!isEditing">
+        <div *ngIf="profileForm.get('name')?.invalid && profileForm.get('name')?.touched" class="error-message">
+          Имя обязательно (макс. 30 символов, мин. 2 символа)
+        </div>
       </div>
 
       <div class="form-group">
         <label>Фамилия</label>
         <input type="text" formControlName="surname" [readonly]="!isEditing">
+        <div *ngIf="profileForm.get('surname')?.invalid && profileForm.get('surname')?.touched" class="error-message">
+          Фамилия обязательна (макс. 50 символов, мин. 2 символа)
+        </div>
       </div>
 
       <div class="form-group">
@@ -25,6 +31,9 @@
       <div class="form-group">
         <label>Дата рождения</label>
         <input type="date" formControlName="birthDate" [readonly]="!isEditing" [max]="yesterday">
+        <div *ngIf="profileForm.get('startDate')?.invalid && profileForm.get('startDate')?.touched " class="error-message">
+          Укажите корректную дату
+        </div>
       </div>
 
       <div *ngIf="!isEditing" class="action-buttons">

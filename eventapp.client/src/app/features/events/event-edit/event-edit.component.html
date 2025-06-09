@@ -1,9 +1,9 @@
 <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="event-edit-form">
   <h2>{{ isEditMode ? 'Редактирование события' : 'Создание события' }}</h2>
-  
+
   <div class="form-group">
     <label>Название события*</label>
-    <input formControlName="name" type="text" placeholder="Введите название">
+    <input formControlName="name" type="text" placeholder="Введите название" [readonly]="isEditMode">
     <div *ngIf="eventForm.get('name')?.invalid && eventForm.get('name')?.touched" class="error-message">
       Название обязательно (макс. 100 символов, мин. 4 символа)
     </div>
@@ -16,7 +16,7 @@
       Максимум 2000 символов
     </div>
   </div>
-
+  
   <div class="form-row">
     <div class="form-group">
       <label>Дата начала*</label>
@@ -29,9 +29,9 @@
     <div class="form-group">
       <label>Макс. участников*</label>
       <input formControlName="maxParticipantsCount" type="number" min="1">
-      <div *ngIf="eventForm.get('maxParticipantsCount')?.invalid 
+      <div *ngIf="eventForm.get('maxParticipantsCount')?.invalid
                && eventForm.get('maxParticipantsCount')?.touched"
-            class="error-message">
+           class="error-message">
         Минимум 4 участника, максимум - 300
       </div>
     </div>

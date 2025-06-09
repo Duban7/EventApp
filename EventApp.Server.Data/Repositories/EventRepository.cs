@@ -13,46 +13,46 @@ namespace Data.Repositories
             _context = context;
         }
 
-        public async Task CreateEvent(Event newEvent)
+        public async Task CreateEvent(Event newEvent, CancellationToken cancellationToken)
         {
             _context.Events.Add(newEvent);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeleteEvent(int eventId)
+        public async Task DeleteEvent(int eventId, CancellationToken cancellationToken)
         {
-          await _context.Events.Where(e => e.Id == eventId).ExecuteDeleteAsync();
+          await _context.Events.Where(e => e.Id == eventId).ExecuteDeleteAsync(cancellationToken);
         }
 
-        public Task<Event?> GetEventById(int eventId) =>
+        public Task<Event?> GetEventById(int eventId, CancellationToken cancellationToken) =>
             _context.Events
             .Where(e => e.Id == eventId)
             .Include(e=>e.Participants)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
-        public Task<Event?> GetEventByName(string eventName) =>
+        public Task<Event?> GetEventByName(string eventName, CancellationToken cancellationToken) =>
             _context.Events
             .AsNoTracking()
             .Where(e => e.Name == eventName)
             .Include(e => e.Participants)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
-        public async Task<PaginatedList<Event>> GetEvents(int pageIndex, int pageSize)
+        public async Task<PaginatedList<Event>> GetEvents(int pageIndex, int pageSize, CancellationToken cancellationToken)
         {
             List<Event>? events = await _context.Events
             .AsNoTracking()
             .OrderBy(e => e.StartDate)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
-            var count = await _context.Events.CountAsync();
+            var count = await _context.Events.CountAsync(cancellationToken);
             var totalPages = (int)Math.Ceiling(count / (double)pageSize);
 
             return new PaginatedList<Event>(events, pageIndex, totalPages);
         }
 
-        public async Task<PaginatedList<Event>> GetEventsFiltered(Event filter, int pageIndex, int pageSize)
+        public async Task<PaginatedList<Event>> GetEventsFiltered(Event filter, int pageIndex, int pageSize, CancellationToken cancellationToken)
         {
             var query = _context.Events.AsQueryable<Event>();
 
@@ -69,30 +69,30 @@ namespace Data.Repositories
                          .Skip((pageIndex - 1) * pageSize)
                          .Take(pageSize);
 
-            List<Event>? events = await query.AsNoTracking().ToListAsync();
+            List<Event>? events = await query.AsNoTracking().ToListAsync(cancellationToken);
 
-            var count = await query.CountAsync();
+            var count = await query.CountAsync(cancellationToken);
             var totalPages = (int)Math.Ceiling(count / (double)pageSize);
 
             return new PaginatedList<Event>(events, pageIndex, totalPages);
         }
 
-        public async Task<Event?> UpdateEvent(Event updatedEvent)
+        public async Task<Event?> UpdateEvent(Event updatedEvent, CancellationToken cancellationToken)
         {
             _context.Events.Update(updatedEvent);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
-            return await _context.Events.AsNoTracking().FirstOrDefaultAsync(e => e.Name == updatedEvent.Name);
+            return await _context.Events.AsNoTracking().FirstOrDefaultAsync(e => e.Name == updatedEvent.Name, cancellationToken);
         }
 
-        public async Task<List<Event>> GetUserEvents(string userId)=>
+        public async Task<List<Event>> GetUserEvents(string userId, CancellationToken cancellationToken)=>
             await _context.Events.Where(e=>e.Participants.Any(u=>u.Id == userId))
                                  .AsNoTracking()
-                                 .ToListAsync();
+                                 .ToListAsync(cancellationToken);
 
-        public async Task<int> GetEventParticipantsCount(int eventId) =>
-            _context.Events.Where(e => e.Id == eventId)
+        public async Task<int> GetEventParticipantsCount(int eventId, CancellationToken cancellationToken) =>
+            await _context.Events.Where(e => e.Id == eventId)
                            .Select(e => e.Participants.Count)
-                           .FirstOrDefault();
+                           .FirstOrDefaultAsync(cancellationToken);
     }
 }

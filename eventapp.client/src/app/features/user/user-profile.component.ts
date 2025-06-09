@@ -34,8 +34,8 @@ export class ProfileComponent implements OnInit {
     private router: Router
   ) {
     this.profileForm = this.fb.group({
-      name: ['', [Validators.required]],
-      surname: ['', [Validators.required]],
+      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(30)]],
+      surname: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       email: ['', [Validators.required, Validators.email]],
       birthDate: ['', [Validators.required]]
     });
@@ -108,6 +108,7 @@ export class ProfileComponent implements OnInit {
         this.authService.updateCurrentUser(updatedUser);
         this.isEditing = false;
         this.isLoading = false;
+        this.errorMessage = '';
       },
       error: (err) => {
         this.errorMessage = 'Ошибка при обновлении данных';
