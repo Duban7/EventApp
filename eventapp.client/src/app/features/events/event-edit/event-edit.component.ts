@@ -56,7 +56,7 @@ export class EventEditComponent implements OnInit {
         this.eventForm.patchValue({
           name: event.name,
           description: event.description,
-          startDate: event.startDate ? new Date(new Date().setDate(new Date(event.startDate).getDate()+1)).toISOString().split('T')[0] : null,
+          startDate: event.startDate ? new Date(new Date().setDate(new Date(event.startDate).getDate())).toISOString().split('T')[0] : null,
           eventPlace: event.eventPlace,
           category: event.category,
           maxParticipantsCount: event.maxParticipantsCount
