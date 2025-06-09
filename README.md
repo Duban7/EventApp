@@ -22,7 +22,7 @@ This guide will help you set up and run the application in an isolated environme
 
 3. After startup, the application should be available at:
    + Web interface: http://localhost:4200
-   + API (swagger): https://localhost:8081/swagger
+   + API (swagger): http://localhost:8080/swagger
 
 4. Stopping tha application:
    ```bash
