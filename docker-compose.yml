@@ -16,9 +16,7 @@ services:
     depends_on:
         - db
   db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: mcr.microsoft.com/mssql/server:2025-latest
     environment:
       - SA_PASSWORD=anpWPFI3z4WVfso12FLtaehOswJNvxKPRKaoP9bILhpbjLnp5LHAy
       - ACCEPT_EULA=Y
-    ports:
-      - "1433:1433"
