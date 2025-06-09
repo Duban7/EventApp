@@ -55,7 +55,7 @@ namespace Services.Services
 
             await _userManager.CreateAsync(newUser, password);
 
-            foundUser = await _userManager.FindByEmailAsync(newUser.Email!) ?? throw new NotFoundException("User not found");
+            foundUser = await _userManager.FindByEmailAsync(newUser.Email!);
 
             Claim[] userClaims = [
 
@@ -130,8 +130,7 @@ namespace Services.Services
             foundUser.RefreshToken = _tokenService.GenerateRefreshToken();
             foundUser.RefreshExpires = DateTime.Now.AddDays(7);
 
-            var updateRes = await _userManager.UpdateAsync(foundUser);
-            if (!updateRes.Succeeded) throw new InternalErrorException("couldn't update refresh token");
+            await _userManager.UpdateAsync(foundUser);
 
             UserDTO userDTO = _mapper.Map<UserDTO>(foundUser);
 
@@ -215,6 +214,7 @@ namespace Services.Services
         public async Task<IList<Claim>> GetUserClaims(string userId)
         {
             User? user = await _userManager.FindByIdAsync(userId);
+            if (user == null) throw new NotFoundException("User not found");
 
             return await _userManager.GetClaimsAsync(user);
         } 
